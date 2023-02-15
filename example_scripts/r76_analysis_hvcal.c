@@ -1119,7 +1119,7 @@ for(int s=0;s<nser;s++)timesec[s]=timeend[s]-timestart[s]
 
 
 
-
+/////////////////////////////////////////////////////////////////////////////////////
 // CentOS version
 // need to change char* to TString, and use TString->Data() as argument in Form()
 // need to use proper . or ->, Root is pickier now
@@ -1172,6 +1172,44 @@ TCut ctime0 = "Entry$>60000"
 z[0]->GetEntry(60001);timestart[0]=e[0]->GetLeaf("EventTime")->GetValue();
 timesec[0]=timeend[0]-timestart[0] // only 31 minutes of data
 //
+TCut cgood[10]
+for(int s=0;s<nser;s++){cgood[s]="1";}
+cgood[0]=ctime0
+//
+// write efficiency calculation for each series
+float nrand[10]
+for(int s=0;s<nser;s++)nrand[s]=z[s]->GetEntries(crand) 
+float nrandhit[10]
+for(int s=0;s<nser;s++)nrandhit[s]=z[s]->GetEntries(crand+"PTWKmax>0.5e-6&&PTWKr50>0.0005&&PTWKr50<0.003")
+// note: my criterion for a hit is based on PTWK quantities
+// (it might make more sense to use the triggering channel rather than PT)
+// judgment from data is that PTWKmax>0.5e-6 is well above trigger threshold
+// in the trace window 0.0005 to 0.003 seconds (for PTWKr50) the walk algorithm seems to work properly 
+float twindow = 0.003-0.0005
+float rate_rand[10]
+for(int s=0;s<nser;s++)rate_rand[s] = log(nrand[s]/(nrand[s]-nrandhit[s]))/twindow
+float ntrig[10]
+for(int s=0;s<nser;s++)ntrig[s] = z[s]->GetEntries(!crand+cgood[s]+"PTWKmax>0.5e-6")
+float rate_trig[10]
+for(int s=0;s<nser;s++)rate_trig[s] = ntrig[s]/timesec[s] 
+float effic_write[10]
+for(int s=0;s<nser;s++)effic_write[s] = rate_trig[s]/rate_rand[s]
+//
+for(int s=0;s<nser;s++)cout<<"// "<<rate_rand[s]<<"\t"<<rate_trig[s]<<"\t"<<effic_write[s]<<endl
+// 47.7589      41.5812 0.870648
+// 51.7426      39.1152 0.755958
+// 56.3305      38.9273 0.691051
+// 54.4469      39.1799 0.719599
+// 58.026       34.466  0.593975
+// 54.2522      26.5377 0.489154
+//definitely a big difference in write efficiencies, decreases significantly with increasing bias
+// (because higher bias means higher rate above threshhold)
+//
+//
+// livetime of each series in seconds (run time times write_efficiency
+float livetimesec[10]
+for(int s=0;s<nser;s++)livetimesec[s]=effic_write[s]*timesec[s]
+//
 // Calibrate 0V data
 //z[0]->Draw("PTOFamps>>ham(300,0,1e-6)",!crand+cam[0]+ctime0)
 //ham->SetTitle("0V pTOF with Am-241 cut;pTOF [amps]")
@@ -1201,9 +1239,6 @@ z[0]->SetAlias("pt_keV","7.738820e+07*PTOFamps+1.653756e+13*PTOFamps**2")
 z[0]->Draw("PTwid:PTOFamps>>h(300,0,1e-6,200,100,300)",!crand+cam[0]+ctime0,"colz")
 z[0]->Draw("PTwid:PTINTall>>h(300,0,0.32e-3,200,100,300)",!crand+cam[0]+ctime0,"colz")
 // for 0V data, 0.15e-6 -> width ~ 170 us, 0.8e-6 -> width ~ 200 us
-TCut cgood[10]
-for(int s=0;s<nser;s++){cgood[s]="1";}
-cgood[0]=ctime0
 TH2F* hw = new TH2F("hw","",300,0,0.32e-3,200,100,300)
 TH2F* hww = new TH2F("hww","",300,0,0.32e-3,200,100,2000)
 
@@ -1224,7 +1259,8 @@ cam[1] = "PFOFamps/PTOFamps>0.26"
 z[1]->Draw("PTOFamps:Entry$",!crand+cam[1]+"PTOFamps>0&&PTOFamps<1.6e-6")
 // TODO: the amplitudes have a time dependence, we'll want to correct that 
 // let's try scaling the 0V reference spectrum to the livetime of this series
-h0->Scale(timesec[1]/timesec[0])
+//h0->Scale(timesec[1]/timesec[0]) // CHANGED to livetime, versus runtime
+h0->Scale(livetimesec[1]/livetimesec[0])
 h0->Draw()
 z[1]->Draw("pt_keV/2.15>>h1(200,0,80)",!crand+"pt_keV<80","same")
 h0->SetTitle(";keVee;counts")
@@ -1243,7 +1279,7 @@ c1->Print("~/K100/run076/r76_ladder_0V-4V-cal.png")
 z[1]->Draw("pt_keV/2.15>>h1n(200,0,40)",!crand)
 h1n->SetTitle("-4V;keVee");h1n->Draw();
 c1->Print("~/K100/run076/r76_ladder_-4V_spec.png")
-z[1]->Draw("phidel:pt_keV/2.15>>h1phie(150,0,40,100,-180,180)",!crand,"colz")
+z[1]->Draw("phidel:pt_keV/2.15>>h1phie(150,0,40,100,-180,180)",!crand+cgoodwalk,"colz")
 h1phie->SetTitle("-4V;keVee;phi_delay[degrees]")
 h1phie->Draw("colz")
 c1->Print("~/K100/run076/r76_ladder_-4V_phi_vs_energy.png")
@@ -1261,7 +1297,8 @@ z[2]->Draw("PTwid:PTOFamps>>h(300,0,1e-6,200,100,300)",!crand,"colz")
 z[2]->SetAlias("pt_keV","7.738820e+07*PTOFamps+1.653756e+13*PTOFamps**2")
 z[2]->SetAlias("pt0_keV","7.738820e+07*PTOFamps0+1.653756e+13*PTOFamps0**2")
 //
-h1->Scale(timesec[2]/timesec[1])
+//h1->Scale(timesec[2]/timesec[1]) // CHANGED from runtime to livetime
+h1->Scale(livetimesec[2]/livetimesec[1])
 h1->Draw()
 z[2]->Draw("pt_keV/4.45>>h2(175,0,35)",!crand+"pt_keV<80","same")
 // note that the apparent Luke gain of 4.45 implies a much lower bias, 13.1 V
@@ -1437,4 +1474,73 @@ h2w->Draw()
 z[3]->Draw("pt_keV/7.5>>h3w(180,0,18)",!crand+c3wid,"same")
 z[3]->Draw("pt_keV/7.5>>h3w(180,0,18)",!crand+c3wid+"pt_keV<80","same")
 // implies Vbias of only 24.7 V
+
+// write efficiency calculation example
+z[0]->Draw("PTWKr50:PTWKmax>>hrmt(300,0,4e-6,200,0,0.004)",!crand,"colz")
+z[0]->Draw("PTWKr50:PTWKmax>>hrmr(300,0,4e-6,200,0,0.004)",crand,"colz")
+z[0]->GetEntries(crand)
+z[0]->GetEntries(crand+"PTWKmax>0.5e-6&&PTWKr50>0.0005&&PTWKr50<0.003")
+float twindow = 0.003-0.0005
+float rate_rand = log(15345./(15345.-1727))/twindow //47.7589f
+z[0]->GetEntries(!crand+ctime0+"PTWKmax>0.5e-6")
+float rate_trig = 78339/timesec[0] //41.5812f
+float effic_write = rate_trig/rate_rand // 0.870649f
+
+// plots of prepulse baseline versus PTOF
+z[0]->Draw("PFbs-2465:pt_keV>>h0bse(200,0,80,150,-100,800)",!crand+ctime0,"colz")
+z[1]->Draw("PFbs-3028:pt_keV/2.15>>h1bse(200,0,80,150,-100,800)",!crand,"colz")
+z[2]->Draw("PFbs-2930:pt_keV/4.45>>h2bse(200,0,80,150,-100,800)",!crand,"colz")
+z[3]->Draw("PFbs-3030:pt_keV/8>>h3bse(200,0,80,150,-100,800)",!crand,"colz")
+z[4]->Draw("PFbs-3050:pt_keV/7.5>>h4bse(200,0,80,150,-100,800)",!crand,"colz")
+// Observations:
+//   clearly in the high bias data series, more events are on elevated baselines
+//   elevated baselines clearly throw higher energy events into lower energies - this will distort rate-matching in ladder calibration
+//   LINES ARE CLEAR IN ALL SERIES! couldn't see them before except with pulsewidth
+//   can make a baseline-corrected PTOF
+
+// Example of correcting pt_keV for baseline:
+z[4]->Draw("pt_keV:PFbs-3000>>h4ebs(200,-50,400,150,0,300)",!crand,"colz")
+TGraph g1
+g1.SetPoint(0,0,150)
+g1.SetPoint(1,250,92)
+g1.Draw("*")
+g1.Fit("pol1")
+//p0                        =          150   +/-   1
+//p1                        =       -0.232   +/-   0.00565685
+z[4]->SetAlias("pt_keV_bscorr","pt_keV/(1.-0.232*(PFbs-3000.)/150)")
+z[4]->SetAlias("pt0_keV_bscorr","pt0_keV/(1.-0.232*(PFbs-3000.)/150)")
+z[4]->Draw("pt_keV_bscorr:PFbs-3000>>h4ebs(200,-50,600,150,0,300)",!crand,"colz")
+//
+h4ebs->SetTitle("-84 V data;Baseline elevation;Total phonon energy [keVt]")
+h4ebs->Draw("colz")
+c1->Print("~/K100/run076/r76_n84V_e_vs_baseline.png")
+g1.Draw("*")
+c1->Print("~/K100/run076/r76_n84V_e_vs_baseline_fit.png")
+z[4]->Draw("pt_keV_bscorr:PFbs-3000>>h4ebsc(200,-50,600,150,0,300)",!crand,"colz")
+h4ebsc->SetTitle("-84 V data;Baseline elevation;Baseline-corrected total phonon energy [keVt]")
+h4ebsc->Draw("colz")
+c1->Print("~/K100/run076/r76_n84V_e_vs_baseline_corr.png")
+//
+// quadratic calibration
+z[4]->SetAlias("pt_q_keVee","pt_keV**2*0.0007714-pt_keV*0.02009")
+z[4]->SetAlias("pt0_q_keVee","pt0_keV**2*0.0007714-pt0_keV*0.02009")
+// NO - actually this is not a reasonable calibration.
+//      the linear factor is negative
+//      implying negative energies near zero - doesn't make sense.
+//
+// alternative calibration: y = c*x/(a-x)
+z[4]->SetAlias("pt_alt_keVee","13.1084*pt_keV_bscorr/(287.304-pt_keV_bscorr)")
+z[4]->SetAlias("pt0_alt_keVee","13.1084*pt0_keV_bscorr/(287.304-pt0_keV_bscorr)")
+// this implies Gluke = 21.92 near 0 ... which implies V=79.5 V. Close!
+z[4]->Draw("pt0_alt_keVee>>h4na(100,-0.04,0.04)",crand)
+// sigma = 11.2 eVee
+
+//refine baseline0
+z[4]->Draw("PFbs:Entry$>>hfbsent(200,0,220e3,150,2900,3700)",!crand,"colz")
+g1.SetPoint(0,0,2960)
+g1.SetPoint(1,215e3,2995)
+g1.Draw("*")
+g1.Fit("pol1")
+ 
+
 
