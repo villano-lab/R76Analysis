@@ -1,5 +1,6 @@
-uproot==3
-awkward==0.14
-numpy==1.23
+uproot
 matplotlib
 lmfit
+getpass
+pysftp
+math

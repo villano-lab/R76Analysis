@@ -13,10 +13,10 @@ to the project's root directory.
 These notebooks use data where the HV (High Voltage) served as the trigger mechanism, 
 meaning there is no coincidence data available or used for triggering. 
 
-| **#** | **FileName**      | **Date**  | **Author**    | **Title**     | **Description**                   | **Keywords**  | **Status**    | **Presented?**    |
-|-------|-------------------|-----------|---------------|---------------|-----------------------------------|---------------|---------------|-------------------|
-|   1   | HV1_Calibration   | 2023/1/10 | Kitty Harris  | Calibration   | A first attempt at calibration    | Calibration   | Incomplete    | No                |
-|       |                   |           |               |               |                                   |               |               |                   |
+| **#** | **FileName**          | **Date**   | **Author**    | **Title**                     | **Description**                                                  | **Keywords**     | **Status**    | **Presented?**    |
+|-------|-----------------------|------------|---------------|-------------------------------|------------------------------------------------------------------|------------------|---------------|-------------------|
+|   1   | HV1_Calibration.ipynb | 2023/03/08 | Kitty Harris  | HV1 Calibration               | A first attempt at calibration.                                  | Calibration      | Complete      | Yes               |
+|   2   | AutoHV1Summary.ipynb  | 2023/03/08 | Kitty Harris  | Summary of HV1 Automated Fit  | Describe automatic fit process before moving on to new datasets. | Summary, Calibration, Automation | Not Started  | No |
 
 ## NaI Notebooks
 
