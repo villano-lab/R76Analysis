@@ -1,8 +1,11 @@
 #Imports
-import uproot, getpass, fnmatch, math
+import uproot, getpass, fnmatch, math, warnings
 import pandas as pd
 import numpy as np
-from pysftp import Connection
+try:
+    from pysftp import Connection
+except:
+    warnings.warn("Module `pysftp` was missing. Online functions for use of data via SSH will be unavailable.",warnings.ImportWarning)
 
 #Some constants to be able to call
 fittingfilters = ["EventCategory","PTWKf40","PTWKr40","P[A-Z]bs","P[A-Z]bspost","PTINTall","PFnorm","P[A-Z]OFamps","P[A-Z]WK[rf][24]0"]
@@ -20,6 +23,8 @@ def PTdbs(x):
         + x['PCbspost'] - x['PCbs'] + x['PDbspost'] - x['PDbs'] + x['PEbspost'] - x['PEbs']
         + x['PFbspost'] - x['PFbs'])
     return sumdiff
+def pt_keV(x):
+    return 7.738820e+07*x['PTOFamps']+1.653756e+13*x['PTOFamps']**2
 def PTINTall_PTbscorr(x):
     return x['PTINTall'] - ((x['PTdbs']<0)*0.5*x['PTdbs']*4096/x['PFnorm'])
 def xdel(x):

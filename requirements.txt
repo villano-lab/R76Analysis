@@ -4,3 +4,4 @@ lmfit
 getpass
 pysftp
 math
+paramiko>=3

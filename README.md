@@ -2,9 +2,8 @@
 
 ## OSF Files
 
-Two directories were too large to store through git and are therefore stored [on OSF](https://osf.io/tb29n/) instead. 
+The `R76Data` directory was too large to store through git and are therefore stored [on OSF](https://osf.io/tb29n/) instead. 
 These contain pre-processed data collected and used at UMN. 
-The directories are `R76Data` and `midasfilterFiles`. 
 You should not need these files to run most of the notebooks, but if you do need them, they should be downloaded
 to the project's root directory.
 
@@ -13,10 +12,10 @@ to the project's root directory.
 These notebooks use data where the HV (High Voltage) served as the trigger mechanism, 
 meaning there is no coincidence data available or used for triggering. 
 
-| **#** | **FileName**          | **Date**   | **Author**    | **Title**                     | **Description**                                                  | **Keywords**     | **Status**    | **Presented?**    |
-|-------|-----------------------|------------|---------------|-------------------------------|------------------------------------------------------------------|------------------|---------------|-------------------|
-|   1   | HV1_Calibration.ipynb | 2023/03/08 | Kitty Harris  | HV1 Calibration               | A first attempt at calibration.                                  | Calibration      | Complete      | Yes               |
-|   2   | AutoHV1Summary.ipynb  | 2023/03/08 | Kitty Harris  | Summary of HV1 Automated Fit  | Describe automatic fit process before moving on to new datasets. | Summary, Calibration, Automation | Not Started  | No |
+| **#** | **FileName**          | **Date**   | **Author**    | **Title**                                    | **Description**                                | **Keywords**     | **Status**    | **Presented?**    |
+|-------|-----------------------|------------|---------------|----------------------------------------------|------------------------------------------------|------------------|---------------|-------------------|
+|   1   | HV1_Calibration.ipynb | 2023/03/08 | Kitty Harris  | HV1 Calibration                              | A first attempt at calibration.                | Calibration      | Complete      | Yes               |
+|   2   | AutoHV1Summary.ipynb  | 2023/03/08 | Kitty Harris  | Summary of HV1 Automated Baseline Correction | Describe automatic fit process before moving on to new datasets. | Summary, Calibration, Automation | Started | No |
 
 ## NaI Notebooks
 
