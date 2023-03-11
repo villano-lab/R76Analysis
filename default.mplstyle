@@ -1,0 +1,23 @@
+#Titles
+axes.titlesize: 16
+axes.titleweight: bold
+figure.titlesize: 16
+figure.titleweight: bold
+
+#Axes
+axes.labelsize: 12
+axes.labelweight: bold
+figure.labelsize: 12
+figure.labelweight: bold
+xtick.minor.visible: True
+ytick.minor.visible: True
+
+#Figure
+figure.figsize: 9,6
+figure.constrained_layout.use: True
+legend.markerscale: 10
+
+#Lines
+lines.linestyle: --
+lines.linewidth: 1
+grid.linewidth: 0.5
