@@ -15,7 +15,7 @@ meaning there is no coincidence data available or used for triggering.
 | **#** | **FileName**          | **Date**   | **Author**    | **Title**                                    | **Description**                                | **Keywords**     | **Status**    | **Presented?**    |
 |-------|-----------------------|------------|---------------|----------------------------------------------|------------------------------------------------|------------------|---------------|-------------------|
 |   1   | HV1_Calibration.ipynb | 2023/03/08 | Kitty Harris  | HV1 Calibration                              | A first attempt at calibration.                | Calibration      | Complete      | Yes               |
-|   2   | AutoHV1Summary.ipynb  | 2023/03/08 | Kitty Harris  | Summary of HV1 Automated Baseline Correction | Describe automatic fit process before moving on to new datasets. | Summary, Calibration, Automation | First Draft Completed | No |
+|   2   | AutoHV1Summary.ipynb  | 2023/03/08 | Kitty Harris  | Summary of HV1 Automated Baseline Correction | Describe automatic fit process before moving on to new datasets. | Summary, Calibration, Automation | Second Draft Completed | Yes (2nd draft) |
 
 ## NaI Notebooks
 
