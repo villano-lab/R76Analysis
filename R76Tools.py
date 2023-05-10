@@ -37,6 +37,14 @@ def phidel(x):
     return [180/np.pi*math.atan2(ydelarr[j],xdelarr[j]) for j in range(len(ydelarr))]
 def PSUMbs(x):
     return x["PAbs"]+x["PBbs"]+x["PCbs"]+x["PDbs"]+x["PEbs"]+x["PFbs"]
+def bscorr(x,ratio):
+    try:
+        return x["pt_keV"]/(1.+(x["PSUMbs"]-18000.)*ratio)
+    except KeyError: #Create missing values if necessary
+        x["PSUMbs"] = PSUMbs(x)
+        x["pt_keV"] = pt_keV(x)
+        return pt_keV/(1.+(x["PSUMbs"]-18000.)*ratio)
+                       
 
 # Cuts
 def crand(x):
@@ -48,11 +56,22 @@ def cphi1(x):
 
 #Functions
 def makechain(filelist,filters=None):
+    warnings.filterwarnings("error")
+    if(not filelist):
+        raise ValueError("There are no files in the series.")
     e_chain = pd.DataFrame(); z_chain = pd.DataFrame();        
     for file in filelist:
         if e_chain.empty: #For first entry, generate columns
                 #Thin data before concatenating; runs much faster
-                toadd = uproot.open(file)["rqDir/eventTree"].arrays(library="pd",filter_name=filters)
+                try:
+                    toadd = uproot.open(file)["rqDir/eventTree"].arrays(library="pd",filter_name=filters)
+                except:
+                    if(filters == None):
+                        warnings.warn("A warning was thrown when trying to open the first file and you are not using filters. Consider using filters to speed up the loading process. See the package-provided fittingfilters for ideas. This warning is now disabled for remaining iterations.")
+                    else:
+                        warnings.warn("A warning was thrown and I tried to intercept it, but failed. Sorry! This behavior is now disabled for future iterations.")
+                    warnings.resetwarnings()
+                    toadd = uproot.open(file)["rqDir/eventTree"].arrays(library="pd",filter_name=filters)
                 e_chain = pd.concat([e_chain,toadd],axis=1)
                 
                 toadd = uproot.open(file)["rqDir/zip1"].arrays(library="pd",filter_name=filters)
@@ -63,6 +82,11 @@ def makechain(filelist,filters=None):
 
             toadd = uproot.open(file)["rqDir/zip1"].arrays(library="pd",filter_name=filters)
             z_chain = pd.concat([z_chain,toadd],ignore_index=True)
+    if (e_chain.empty and z_chain.empty):
+        if filters != None:
+            warnings.warn("Returning nothing! Does the series contain the filters provided?"+str(filters))
+        else:
+            warnings.warn("Returning nothing! Series appears to be empty.")
     return e_chain,z_chain
 
 def getonlinefiles(directory,c,path=onlinepaths["fritts"]):
