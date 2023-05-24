@@ -1,0 +1,3 @@
+07221023_1051 looks like NaI data but says DCRC1pA 2
+07221022_1630 same. they both say 'NaI window not fixed' maybe that's the issue
+07221021_1001 strange vertical artifact after correction, and data are mostly negative...
