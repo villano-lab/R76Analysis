@@ -58,35 +58,31 @@ def cphi1(x):
 def makechain(filelist,filters=None):
     warnings.filterwarnings("error")
     if(not filelist):
-        raise ValueError("There are no files in the series.")
-    e_chain = pd.DataFrame(); z_chain = pd.DataFrame();        
-    for file in filelist:
-        if e_chain.empty: #For first entry, generate columns
-                #Thin data before concatenating; runs much faster
-                try:
-                    toadd = uproot.open(file)["rqDir/eventTree"].arrays(library="pd",filter_name=filters)
-                except:
-                    if(filters == None):
-                        warnings.warn("A warning was thrown when trying to open the first file and you are not using filters. Consider using filters to speed up the loading process. See the package-provided fittingfilters for ideas. This warning is now disabled for remaining iterations.")
-                    else:
-                        warnings.warn("A warning was thrown and I tried to intercept it, but failed. Sorry! This behavior is now disabled for future iterations.")
-                    warnings.resetwarnings()
-                    toadd = uproot.open(file)["rqDir/eventTree"].arrays(library="pd",filter_name=filters)
-                e_chain = pd.concat([e_chain,toadd],axis=1)
-                
-                toadd = uproot.open(file)["rqDir/zip1"].arrays(library="pd",filter_name=filters)
-                z_chain = pd.concat([z_chain,toadd],axis=1)
-        else:
-            toadd = uproot.open(file)["rqDir/eventTree"].arrays(library="pd",filter_name=filters)
-            e_chain = pd.concat([e_chain,toadd],ignore_index=True)
-
-            toadd = uproot.open(file)["rqDir/zip1"].arrays(library="pd",filter_name=filters)
-            z_chain = pd.concat([z_chain,toadd],ignore_index=True)
+        raise ValueError("There are no files provided!")
+    e_chain = pd.DataFrame(); z_chain = pd.DataFrame();
+    listframes = [[],[]]
+    try:
+        estuff = uproot.iterate(filelist+":rqDir/eventTree",filter_name=filters,
+                                library="pd")
+        zstuff = uproot.iterate(filelist+":rqDir/zip1",filter_name=filters,
+                                library="pd")
+    except:
+            warnings.resetwarnings()
+            if(filters == None):
+                warnings.warn("A warning was thrown when trying to open the first file and you are not using filters. Consider using filters to speed up the loading process. See the package-provided fittingfilters for ideas.")
+            else:
+                warnings.warn("A warning was thrown and I tried to intercept it, but failed. Sorry!")
+    warnings.resetwarnings() #we are done catching warnings, so disable this behavior.
+    warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
+    for ething,zthing in zip(estuff,zstuff):
+            listframes[0].append(ething);listframes[1].append(zthing)
+    z_chain = pd.concat(listframes[0])
+    e_chain = pd.concat(listframes[1])
     if (e_chain.empty and z_chain.empty):
         if filters != None:
             warnings.warn("Returning nothing! Does the series contain the filters provided?"+str(filters))
         else:
-            warnings.warn("Returning nothing! Series appears to be empty.")
+            warnings.warn("Returning nothing! Files appear to be empty.")
     return e_chain,z_chain
 
 def getonlinefiles(directory,c,path=onlinepaths["fritts"]):
