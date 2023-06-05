@@ -44,7 +44,6 @@ def bscorr(x,ratio):
         x["PSUMbs"] = PSUMbs(x)
         x["pt_keV"] = pt_keV(x)
         return pt_keV/(1.+(x["PSUMbs"]-18000.)*ratio)
-                       
 
 # Cuts
 def crand(x):
