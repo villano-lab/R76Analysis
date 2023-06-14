@@ -3,4 +3,4 @@
 07221021_1001 strange vertical artifact after correction, and data are mostly negative...
 07220924_1233 lines aren't clear enough to identify. Tried picking a few different lines but no luck.
 07220921_2055 got a correction but it says that triggering stopped. The correction is a bit odd, only works for the lower middle portion. Also doesn't share a correction as I would have expected.
-07220707_1643 most of the data is at a negative elevation.
+07220707_1643 most of the data is at a negative elevation, and the only discernible data is a vertival artifact.
