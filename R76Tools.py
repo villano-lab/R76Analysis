@@ -75,8 +75,8 @@ def makechain(filelist,filters=None):
     warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
     for ething,zthing in zip(estuff,zstuff):
             listframes[0].append(ething);listframes[1].append(zthing)
-    z_chain = pd.concat(listframes[0])
-    e_chain = pd.concat(listframes[1])
+    z_chain = pd.concat(listframes[1])
+    e_chain = pd.concat(listframes[0])
     if (e_chain.empty and z_chain.empty):
         if filters != None:
             warnings.warn("Returning nothing! Does the series contain the filters provided?"+str(filters))
