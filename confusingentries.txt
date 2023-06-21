@@ -1,7 +1,7 @@
 07221023_1051 looks like NaI data but says DCRC1pA 2
 07221022_1630 same. they both say 'NaI window not fixed' maybe that's the issue
 07221021_1001 strange vertical artifact after correction, and data are mostly negative... says "3 railed channels", not sure what "railed" means
+07220921_2055 got a correction but it says that triggering stopped. The correction is a bit odd, only works for the lower middle portion. Also doesn't share a correction as I would have expected.
 07220924_1233 lines aren't clear enough to identify. Tried picking a few different lines but no luck. -4V may be too small
 07220826_1219 ^
-07220513_0952 ^
-07220921_2055 got a correction but it says that triggering stopped. The correction is a bit odd, only works for the lower middle portion. Also doesn't share a correction as I would have expected.
+07220513_0952 ^ Matt has confirmed that these are OK
