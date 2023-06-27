@@ -1,0 +1,4 @@
+#DataThief /Users/villaa/./trello/PIC2_R76_calib.png Tuesday 27-Jun-2023 6:13:39 AM
+0.1857, -0.0349
+147.831, 13.9621
+165.0393, 17.7626
