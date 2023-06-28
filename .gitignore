@@ -1,13 +1,18 @@
+confusingentries.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
+tex.cache/
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+coin_analysis/
+data/
+mplstyles/
+python/
 build/
 develop-eggs/
 dist/
