@@ -7,8 +7,8 @@ figure.titleweight: bold
 #Axes
 axes.labelsize: 12
 axes.labelweight: bold
-
-
+figure.labelsize: 12
+figure.labelweight: bold
 xtick.minor.visible: True
 ytick.minor.visible: True
 

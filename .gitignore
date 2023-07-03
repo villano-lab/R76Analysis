@@ -1,4 +1,4 @@
-confusingentries.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -9,10 +9,7 @@ tex.cache/
 
 # Distribution / packaging
 .Python
-coin_analysis/
-data/
-mplstyles/
-python/
+mplstyles/tex.cache/
 build/
 develop-eggs/
 dist/
