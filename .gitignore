@@ -1,13 +1,15 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
+tex.cache/
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+mplstyles/tex.cache/
 build/
 develop-eggs/
 dist/
