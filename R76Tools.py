@@ -54,15 +54,17 @@ def cphi1(x):
     return [(y>5) and (y < 20) for y in phidel(x)]
 
 #Functions
-def makechain(filepath,filters=None):
+def makechain(filelist,filters=None):
     warnings.filterwarnings("error")
-    if(not filepath):
+    if(not filelist):
         raise ValueError("There are no files provided!")
     e_chain = pd.DataFrame(); z_chain = pd.DataFrame();
     listframes = [[],[]]
     try:
-        estuff = uproot.iterate(filepath+"/umn*root:rqDir/eventTree",filter_name=filters,library="pd")
-        zstuff = uproot.iterate(filepath+"/umn*root:rqDir/zip1",filter_name=filters,library="pd")
+        estuff = uproot.iterate(filelist+":rqDir/eventTree",filter_name=filters,
+                                library="pd")
+        zstuff = uproot.iterate(filelist+":rqDir/zip1",filter_name=filters,
+                                library="pd")
     except:
             warnings.resetwarnings()
             if(filters == None):
