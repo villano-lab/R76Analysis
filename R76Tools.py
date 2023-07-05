@@ -89,6 +89,7 @@ def makechain(filelist,filters=None,friends=True,aliases=[],trees=["e","z"]):
     z_chain = pd.DataFrame();
     z4_chain = pd.DataFrame();
     listframes = [[],[],[]]
+    retry = False
     try:
         if "e" in trees:
             estuff = uproot.iterate(filelist+":rqDir/eventTree",filter_name=filters,
@@ -104,9 +105,20 @@ def makechain(filelist,filters=None,friends=True,aliases=[],trees=["e","z"]):
             if(filters == None):
                 warnings.warn("A warning was thrown when trying to open the first file and you are not using filters. Consider using filters to speed up the loading process. See the package-provided fittingfilters for ideas.")
             else:
-                warnings.warn("A warning was thrown and I tried to intercept it, but failed. Sorry!")
+                warnings.warn("A warning was thrown and I tried to intercept it, but failed. Retrying with this behavior disabled.")
+                retry = True
     warnings.resetwarnings() #we are done catching warnings, so disable this behavior.
     warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
+    if retry:
+        if "e" in trees:
+            estuff = uproot.iterate(filelist+":rqDir/eventTree",filter_name=filters,
+                                library="pd")
+        if "z" in trees:
+            zstuff = uproot.iterate(filelist+":rqDir/zip1",filter_name=filters,
+                                library="pd")
+        if "z4" in trees:
+            z4stuff = uproot.iterate(filelist+":rqDir/zip4",filter_name=filters,
+                                library="pd")
     if "e" in trees:
         for ething in estuff:
             listframes[0].append(ething)
