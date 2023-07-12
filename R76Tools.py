@@ -150,10 +150,12 @@ def makechain(filelist,filters=None,friends=True,aliases=[],trees=["e","z"]):
             else:
                 return e_chain,z_chain
 def makechain_list(serieslist,path="",filters=None,friends=True,aliases=[],trees=["e","z"]):
-    if "z" in trees:
-        z = list(np.zeros(len(serieslist)))
     if "e" in trees:
         e = list(np.zeros(len(serieslist)))
+    if "z" in trees:
+        z = list(np.zeros(len(serieslist)))
+    if "z4" in trees:
+        z4 = list(np.zeros(len(serieslist)))
     for i,s in enumerate(serieslist):
         if "e" in trees:
             if "z" in trees:

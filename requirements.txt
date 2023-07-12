@@ -1,7 +1,8 @@
-uproot
+uproot >= 5
+tqdm
+dataPython
+numpy
+scipy
 matplotlib
 lmfit
-getpass
-pysftp
-math
-paramiko>=3
+pandas
