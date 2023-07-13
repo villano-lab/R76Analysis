@@ -140,7 +140,10 @@ def makechain(filelist,filters=None,friends=True,aliases=[],trees=["e","z"]):
         if "e" in trees:
             z_chain = pd.concat([e_chain,z_chain],axis=1)
         if "z4" in trees:
-            z4_chain = pd.concat([z_chain,z4_chain],axis=1)
+            z4_temp = z4_chain.copy()
+            for name in z4_temp.keys():
+                z4_temp = z4_temp.rename(columns={name:"zip4."+name})
+            z_chain = pd.concat([z_chain,z4_temp],axis=1)
     for alias in aliases:
         z_chain[alias] = globals()[alias](z_chain)
     if "e" in trees:
