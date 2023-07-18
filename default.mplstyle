@@ -5,12 +5,14 @@ figure.titlesize: 16
 figure.titleweight: bold
 
 #Axes
-axes.labelsize: 12
+axes.labelsize: 13
 axes.labelweight: bold
-figure.labelsize: 12
+figure.labelsize: 13
 figure.labelweight: bold
 xtick.minor.visible: True
 ytick.minor.visible: True
+xtick.labelsize: 13
+ytick.labelsize: 13
 
 #Figure
 figure.figsize: 9,6
@@ -21,3 +23,4 @@ legend.markerscale: 10
 lines.linestyle: --
 lines.linewidth: 1
 grid.linewidth: 0.5
+axes.grid: True
