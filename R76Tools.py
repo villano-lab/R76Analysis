@@ -9,11 +9,13 @@ except:
 
 #Some constants to be able to call
 fittingfilters = ["EventCategory","PTWKf40","PTWKr40","P[A-Z]bs","P[A-Z]bspost","PTINTall","PFnorm","P[A-Z]OFamps","P[A-Z]WK[rf][24]0"]
+qualityfilters = fittingfilters+["PTOFamps0"]
 calibrationaliases = ["crand","PTwid","xdel","ydel","phidel","pt_keV","pt0_keV","PSUMbs","BSel","cbs"]
+qualityaliases = calibrationaliases+["cgoodwalk","PTINTall_PTbscorr","cofintl","cofintt"]
 y_calib = [13.95,17.74]
 
-onlinepaths = {
-    'fritts': "/data/chocula/fritts/data/k100proc/midasrq/byseries",
+paths = {
+    'fritts': "/data/chocula/fritts/data/k100proc/midasrq/byseries/",
     'neog': "/data/chocula/neog/rq/"
 }
                      
@@ -30,7 +32,11 @@ def pt_keV(x):
 def pt0_keV(x):
     return 7.738820e+07*x['PTOFamps0']+1.653756e+13*x['PTOFamps0']**2
 def PTINTall_PTbscorr(x):
-    return x['PTINTall'] - ((x['PTdbs']<0)*0.5*x['PTdbs']*4096/x['PFnorm'])
+    try:
+        PTdbsarr = PTdbs(x)
+    except:
+        x['PTdbs'] = PTdbs(x)
+    return x['PTINTall'] - (PTdbsarr<0)*0.5*PTdbsarr*4096/x['PFnorm']
 def xdel(x):
     return 1e6*(x['PEWKr20'] - 0.5*(x['PCWKr20']+x['PDWKr20']))-1
 def ydel(x):
@@ -74,7 +80,19 @@ def cbs(x):
 def cgoodwalk(x):
     return (x["PCWKr20"] > 0.25e-3) & (x["PCWKr20"] < 0.5e-3) & (x["PDWKr20"] > 0.25e-3) & (x["PDWKr20"] < 0.5e-3) & (
         x["PEWKr20"] > 0.25e-3) & (x["PEWKr20"] < 0.5e-3)
-
+def cofintl(x):
+    try:
+        PTINTall_arr = x["PTINTall_PTbscorr"]
+    except:
+        PTINTall_arr = x["PTINTall_PTbscorr"]
+    return (PTINTall_arr/x["PTOFamps"]>50) & (PTINTall_arr/x["PTOFamps"]<750)
+def cofintt(x):
+    try:
+        PTINTall_arr = x["PTINTall_PTbscorr"]
+    except:
+        PTINTall_arr = x["PTINTall_PTbscorr"]
+    return (PTINTall_arr/x["PTOFamps"]>250) & (PTINTall_arr/x["PTOFamps"]<550)
+        
 #Functions
 def makechain(filelist,filters=None,friends=True,aliases=[],trees=["e","z"]):
     #filelist: matches a list of files to import as the chain
@@ -173,13 +191,13 @@ def makechain_list(serieslist,path="",filters=None,friends=True,aliases=[],trees
             else:
                 return e,z
 
-def getonlinefiles(directory,c,path=onlinepaths["fritts"]):
+def getonlinefiles(directory,c,path=paths["fritts"]):
     c.chdir(path)
     ls = c.listdir(directory); ls = fnmatch.filter(ls, 'umn*.root')
     filelist = [c.open(directory+"/"+filename) for filename in ls]
     return filelist
 
-def makeonlinechain(directory,user=None,filters=None,path=onlinepaths["fritts"]):
+def makeonlinechain(directory,user=None,filters=None,path=paths["fritts"]):
     if user == None:
         user = getpass.getuser()
     with Connection("cdms2.spa.umn.edu",user) as c:
