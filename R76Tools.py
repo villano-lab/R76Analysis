@@ -9,7 +9,8 @@ except:
 
 #Some constants to be able to call
 fittingfilters = ["EventCategory","PTWKf40","PTWKr40","P[A-Z]bs","P[A-Z]bspost","PTINTall","PFnorm","P[A-Z]OFamps","P[A-Z]WK[rf][24]0"]
-qualityfilters = fittingfilters+["PTOFamps0"]
+qualityfilters = fittingfilters+["PTOFamps0"] #May be able to trim this
+coincidencefilters = qualityfilters+["PTOFdelay"] #^same
 calibrationaliases = ["crand","PTwid","xdel","ydel","phidel","pt_keV","pt0_keV","PSUMbs","BSel","cbs"]
 qualityaliases = calibrationaliases+["cgoodwalk","PTINTall_PTbscorr","cofintl","cofintt"]
 y_calib = [13.95,17.74]
@@ -55,8 +56,8 @@ def afdel(x):
     return 1e6*(x["PFWKr20"]-x["PAWKr20"])
 def PSUMbs(x):
     return x["PAbs"]+x["PBbs"]+x["PCbs"]+x["PDbs"]+x["PEbs"]+x["PFbs"]
-def BSel(x):
-    return x["PSUMbs"]-17900
+def BSel(x,base=18400):
+    return x["PSUMbs"]-base
 def bscorr(x,ratio):
     try:
         return x["pt_keV"]/(1.+(x["PSUMbs"]-18000.)*ratio)
@@ -74,9 +75,9 @@ def cphi1(x):
     return [(y>5) and (y < 20) for y in phidel(x)]
 def cbs(x):
     try: #try to call exist
-        return x["Bsel"]<1250
+        return x["Bsel"]<1100
     except: #build if does not yet exist.
-        return BSel(x)<1250
+        return BSel(x)<1100
 def cgoodwalk(x):
     return (x["PCWKr20"] > 0.25e-3) & (x["PCWKr20"] < 0.5e-3) & (x["PDWKr20"] > 0.25e-3) & (x["PDWKr20"] < 0.5e-3) & (
         x["PEWKr20"] > 0.25e-3) & (x["PEWKr20"] < 0.5e-3)
