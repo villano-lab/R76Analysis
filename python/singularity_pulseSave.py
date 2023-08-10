@@ -22,6 +22,7 @@ from rawio import IO
 from ROOT import TCanvas, TGraph, gStyle, TH1F
 #from ROOT import TF1
 import uproot
+import pickle
 
 
 import os
@@ -54,7 +55,16 @@ if __name__ == "__main__":
 
         try:
           events=io.getRawEvents(frittsdir+"raw/"+"byseries/",series)
-          print(np.shape(events))
+          onepulse=events['Z1']['PA'][71810071415, 10000]
+          print(np.shape(onepulse))
+          fileObj = open('pulses.pkl', 'wb')
+          pickle.dump(onepulse,fileObj)
+          fileObj.close()
+          ##how to read
+          #fileObj = open('data.obj', 'rb')
+          #exampleObj = pickle.load(fileObj)
+          #fileObj.close()
+          #print(exampleObj)
         except KeyboardInterrupt:
           print('Shutdown requested .... exiting')
         except Exception:
