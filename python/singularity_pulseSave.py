@@ -50,12 +50,14 @@ if __name__ == "__main__":
         series = args.series
 
         frittsdir = "/data/chocula/fritts/data/k100proc/midas"
+        avdir = "/data/chocula/villaa/pyraw_staging"
         print(frittsdir+"raw/"+"byseries")
 	
 
         try:
-          events=io.getRawEvents(frittsdir+"raw/"+"byseries/",series)
-          onepulse=events['Z1']['PA'][71810071415, 10000]
+          #events=io.getRawEvents(frittsdir+"raw/"+"byseries/",series)
+          events=io.getRawEvents(avdir+"/",series)
+          onepulse=events['Z1']['PA'][72209171225, 1970453]
           print(np.shape(onepulse))
           fileObj = open('pulses.pkl', 'wb')
           pickle.dump(onepulse,fileObj)
