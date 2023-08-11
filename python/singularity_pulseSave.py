@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
         try:
           #events=io.getRawEvents(frittsdir+"raw/"+"byseries/",series)
-          events=io.getRawEvents(avdir+"/",series)
+          events=io.getRawEvents(avdir+"/",series,eventNumbers=[1970453])
           onepulse=events['Z1']['PA'][72209171225, 1970453]
           print(np.shape(onepulse))
           fileObj = open('pulses.pkl', 'wb')
