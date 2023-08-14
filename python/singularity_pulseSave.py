@@ -65,6 +65,25 @@ def parseEventList(fname="../coin_analysis/data/r76-80V-naitrig-100eV-goodchi.tx
        print(slist)
        return slist
 
+def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
+     
+       allevents=[]
+       for s in ev:
+         print(pdir)
+         print(series)
+         events=io.getRawEvents(pdir,s,eventNumbers=ev[s])
+         allevents.append(events)
+
+       #pulsedata = pd.DataFrame(allevents)
+       pulsedata = pd.DataFrame()
+       for i,df in enumerate(allevents):
+         if i==0:
+           pulsedata=df
+         else:
+           pulsedata = pd.concat([pulsedata, df])
+        
+       return pulsedata 
+
 #the stuff below is so this functionality can be used as a script
 ########################################################################
 if __name__ == "__main__":
@@ -84,18 +103,20 @@ if __name__ == "__main__":
         frittsdir = "/data/chocula/fritts/data/k100proc/midas"
         avdir = "/data/chocula/villaa/pyraw_staging"
         print(frittsdir+"raw/"+"byseries")
-        parseEventList()	
+        elist = parseEventList()	
 
         try:
           #events=io.getRawEvents(frittsdir+"raw/"+"byseries/",series)
 
           print('trying...')
+          pulsedata = gatherPulses(pdir=frittsdir+"raw/byseries/",ev=elist)
+          print(np.shape(pulsedata))
           #events=io.getRawEvents(avdir+"/",series,eventNumbers=[1970453])
           #onepulse=events['Z1']['PA'][72209171225, 1970453]
           #print(np.shape(onepulse))
-          #fileObj = open('pulses.pkl', 'wb')
-          #pickle.dump(onepulse,fileObj)
-          #fileObj.close()
+          fileObj = open('pulses.pkl', 'wb')
+          pickle.dump(pulsedata,fileObj)
+          fileObj.close()
 
           ##how to read
           #fileObj = open('data.obj', 'rb')
