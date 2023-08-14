@@ -52,14 +52,18 @@ def parseEventList(fname="../coin_analysis/data/r76-80V-naitrig-100eV-goodchi.tx
        #for s in useriesgood:
        #    cseries=(sn==s)
        #    print(en[cseries])
-       list = []
+       slist = {}
        for s in useriesgood:
            cseries=(sn==s)
            print(en[cseries])
-           list.append(en[cseries])
+           sseries = '{}'.format(s)
+           sseries = '0'+sseries
+           sseries = sseries[:-4] + '_' + sseries[-4:]
+           slist[sseries] = en[cseries]
+           #slist.append(en[cseries])
 
-       print(list)
-       return 
+       print(slist)
+       return slist
 
 #the stuff below is so this functionality can be used as a script
 ########################################################################
