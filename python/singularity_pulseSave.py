@@ -23,6 +23,7 @@ from ROOT import TCanvas, TGraph, gStyle, TH1F
 #from ROOT import TF1
 import uproot
 import pickle
+import pandas as pd
 
 
 import os
@@ -32,6 +33,35 @@ import argparse
 from argparse import ArgumentParser, ArgumentTypeError
 # Author: A. Villano
 #
+
+def parseEventList(fname="../coin_analysis/data/r76-80V-naitrig-100eV-goodchi.txt"):
+
+       evdata = pd.read_csv(fname, skiprows=0, engine='python',skipfooter=0, \
+            names=['SeriesNumber','EventNumber'], \
+            delim_whitespace=True)
+
+       print (evdata.head(10))
+
+       sn = np.asarray(evdata['SeriesNumber'])
+       en = np.asarray(evdata['EventNumber'])
+
+       print(np.unique(sn))
+
+       useriesgood = np.unique(sn)
+
+       #for s in useriesgood:
+       #    cseries=(sn==s)
+       #    print(en[cseries])
+       list = []
+       for s in useriesgood:
+           scut = series[csiggood]
+           ecut = ev[csiggood]
+           cseries=(scut==s)
+           print(ecut[cseries])
+           list.append(ecut[cseries])
+
+       print(list)
+       return 
 
 #the stuff below is so this functionality can be used as a script
 ########################################################################
@@ -52,16 +82,19 @@ if __name__ == "__main__":
         frittsdir = "/data/chocula/fritts/data/k100proc/midas"
         avdir = "/data/chocula/villaa/pyraw_staging"
         print(frittsdir+"raw/"+"byseries")
-	
+        parseEventList()	
 
         try:
           #events=io.getRawEvents(frittsdir+"raw/"+"byseries/",series)
-          events=io.getRawEvents(avdir+"/",series,eventNumbers=[1970453])
-          onepulse=events['Z1']['PA'][72209171225, 1970453]
-          print(np.shape(onepulse))
-          fileObj = open('pulses.pkl', 'wb')
-          pickle.dump(onepulse,fileObj)
-          fileObj.close()
+
+          print('trying...')
+          #events=io.getRawEvents(avdir+"/",series,eventNumbers=[1970453])
+          #onepulse=events['Z1']['PA'][72209171225, 1970453]
+          #print(np.shape(onepulse))
+          #fileObj = open('pulses.pkl', 'wb')
+          #pickle.dump(onepulse,fileObj)
+          #fileObj.close()
+
           ##how to read
           #fileObj = open('data.obj', 'rb')
           #exampleObj = pickle.load(fileObj)
