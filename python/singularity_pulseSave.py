@@ -54,11 +54,9 @@ def parseEventList(fname="../coin_analysis/data/r76-80V-naitrig-100eV-goodchi.tx
        #    print(en[cseries])
        list = []
        for s in useriesgood:
-           scut = series[csiggood]
-           ecut = ev[csiggood]
-           cseries=(scut==s)
-           print(ecut[cseries])
-           list.append(ecut[cseries])
+           cseries=(sn==s)
+           print(en[cseries])
+           list.append(en[cseries])
 
        print(list)
        return 
