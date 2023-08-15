@@ -34,7 +34,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 # Author: A. Villano
 #
 
-def parseEventList(fname="../coin_analysis/data/r76-80V-naitrig-100eV-badchi.txt"):
+def parseEventList(fname="../coin_analysis/data/r76-80V-nairand-100eV-goodchi.txt"):
 
        evdata = pd.read_csv(fname, skiprows=0, engine='python',skipfooter=0, \
             names=['SeriesNumber','EventNumber'], \
