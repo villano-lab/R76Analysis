@@ -70,7 +70,6 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
        allevents=[]
        for s in ev:
          print(pdir)
-         print(series)
          events=io.getRawEvents(pdir,s,eventNumbers=ev[s])
          allevents.append(events)
 
@@ -90,7 +89,9 @@ if __name__ == "__main__":
 
         #make a parser for the input
         parser = argparse.ArgumentParser(description='options')
-        parser.add_argument('-s','--series', type=str, dest='series', default='07181007_1415', help='series to load')
+        parser.add_argument('-l','--evlist', type=str, dest='evlist', default='../coin_analysis/data/r76-80V-naitrig-100eV-goodchi.txt', \
+        help='series/event list')
+        #parser.add_argument('-s','--series', type=str, dest='series', default='07181007_1415', help='series to load')
         #parser.add_argument('-d','--filedir', type=str, dest='filedir', default='./', help='directory to look for files')
         #parser.add_argument('-x','--regex', type=str, dest='regstr', default=r'(.*?)', help='regex for picking up files')
         #parser.add_argument('-o','--outfile', type=str, dest='outfile', default='data.h5', help='output file for data')
@@ -98,12 +99,13 @@ if __name__ == "__main__":
         #parser.set_defaults(filedir='./');
 
         args = parser.parse_args()
-        series = args.series
+        #series = args.series
+        evlist = args.evlist
 
         frittsdir = "/data/chocula/fritts/data/k100proc/midas"
         avdir = "/data/chocula/villaa/pyraw_staging"
-        print(frittsdir+"raw/"+"byseries")
-        elist = parseEventList()	
+        #print(frittsdir+"raw/"+"byseries")
+        elist = parseEventList(evlist)	
 
         try:
           #events=io.getRawEvents(frittsdir+"raw/"+"byseries/",series)
