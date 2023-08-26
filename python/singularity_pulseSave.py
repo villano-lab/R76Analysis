@@ -70,6 +70,8 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
        allevents=[]
        for s in ev:
          print(pdir)
+         print(s)
+         print(ev)
          events=io.getRawEvents(pdir,s,eventNumbers=ev[s])
          allevents.append(events)
 
