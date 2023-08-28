@@ -72,7 +72,7 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
          print(pdir)
          print(s)
          print(ev)
-         events=io.getRawEvents(pdir,s,eventNumbers=ev[s])
+         events=io.getRawEvents(pdir,s,eventNumbers=ev[s],skipEmptyEvents=False)
          allevents.append(events)
 
        #pulsedata = pd.DataFrame(allevents)
