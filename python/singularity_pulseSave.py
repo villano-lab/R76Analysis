@@ -24,6 +24,7 @@ from ROOT import TCanvas, TGraph, gStyle, TH1F
 import uproot
 import pickle
 import pandas as pd
+import statistics as st
 
 
 import os
@@ -72,6 +73,7 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
          print(pdir)
          print(s)
          print(ev)
+         eventShift(pdir,series=s,ev=ev[s])
          events=io.getRawEvents(pdir,s,eventNumbers=ev[s],skipEmptyEvents=False)
          allevents.append(events)
 
@@ -84,6 +86,34 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
            pulsedata = pd.concat([pulsedata, df])
         
        return pulsedata 
+
+def eventShift(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_2118',ev=None):
+
+       dumps=(ev-ev%10000)/10000
+       dumps=dumps.astype(int)
+       udumps=np.unique(dumps)
+       print(udumps)
+
+       for d in udumps:
+         theseev = ev[dumps==d]
+         #make an event number vector that has all events up to the max
+         fullev=[]
+         for i in np.arange(d*10000,np.max(theseev)+1):
+           fullev.extend([i])
+
+         print(fullev)
+         events=io.getRawEvents(pdir,series,eventNumbers=fullev)
+         print(events)
+
+
+       return
+
+def isRailed(v):
+    if(np.isnan(v).any()):
+        return True
+    if(st.mode(v)==0):
+        return True
+    return False
 
 #the stuff below is so this functionality can be used as a script
 ########################################################################
