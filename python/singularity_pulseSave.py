@@ -103,7 +103,11 @@ def eventShift(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_2118'
 
          print(fullev)
          events=io.getRawEvents(pdir,series,eventNumbers=fullev)
-         print(events)
+         for j in fullev:
+           intseries=np.char.replace(series,'_','')
+           intseries=int(intseries)
+           #print(intseries)
+           print(events['Z1']['PA'][intseries,j])
 
 
        return
