@@ -76,7 +76,8 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
          #eventShift(pdir,series=s,ev=ev[s])
          dd=getDumpDict(ev=ev[s])
          print(dd)
-         events=io.getRawEvents(pdir,s,eventNumbers=ev[s],skipEmptyEvents=False)
+         events=fetchModifiedDF(pdir,series=s,dumps_dict=dd)
+         #events=io.getRawEvents(pdir,s,eventNumbers=ev[s],skipEmptyEvents=False)
          allevents.append(events)
 
        #pulsedata = pd.DataFrame(allevents)
@@ -106,6 +107,39 @@ def getDumpDict(ev=None):
 
        return dumpdict
        
+def fetchModifiedDF(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_2118',dumps_dict=None):
+       # initialize list
+       event_data_list=list()
+       event_num_list=list()
+       event_series_list=list()
+  
+       # instantiate  raw data reader 
+       myreader = io.RawDataReader(filepath=pdir, series=series)
+ 
+       # loop dumps
+       for  dump, event_nums in dumps_dict.items():
+          events =  myreader.read_events(dump_nums=[dump], output_format=2, skip_empty=True)
+ 
+          # loop event numbers for the dump
+          for event_num in  event_nums:
+ 
+            # extract data based on index
+            index = event_num%10000
+            data = events[index]
+            detectors = [key for key in data.keys() if key.startswith('Z')]
+   
+            # append to list
+            event_num_list.append(event_num)
+            event_series_list.append(data['event']['SeriesNumber'])
+            event_data_list.append(pd.Series({key: data[key] for key in detectors}))    
+ 
+ 
+       # convert to multi index dataframe
+       index_arrays = [np.array(event_series_list), np.array(event_num_list)]
+       df = pd.DataFrame(event_data_list, index=index_arrays)
+ 
+       return df
+
 def eventShift(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_2118',ev=None):
 
        dumps=(ev-ev%10000)/10000
