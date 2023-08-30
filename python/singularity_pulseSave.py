@@ -73,7 +73,9 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
          print(pdir)
          print(s)
          print(ev)
-         eventShift(pdir,series=s,ev=ev[s])
+         #eventShift(pdir,series=s,ev=ev[s])
+         dd=getDumpDict(ev=ev[s])
+         print(dd)
          events=io.getRawEvents(pdir,s,eventNumbers=ev[s],skipEmptyEvents=False)
          allevents.append(events)
 
@@ -87,6 +89,23 @@ def gatherPulses(pdir="/data/chocula/villaa/pyraw_staging/",ev=None):
         
        return pulsedata 
 
+def getDumpDict(ev=None):
+
+       dumps=(ev-ev%10000)/10000
+       dumps=dumps.astype(int)
+       udumps=np.unique(dumps)
+       print(udumps)
+
+       dumpdict=dict()
+
+       for d in udumps:
+         theseev = np.sort(ev[dumps==d])
+         dumpdict[d]=theseev
+
+       print(dumpdict)
+
+       return dumpdict
+       
 def eventShift(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_2118',ev=None):
 
        dumps=(ev-ev%10000)/10000
@@ -94,20 +113,41 @@ def eventShift(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_2118'
        udumps=np.unique(dumps)
        print(udumps)
 
+       dumpdict=dict()
+
        for d in udumps:
-         theseev = ev[dumps==d]
+         theseev = np.sort(ev[dumps==d])
+         dumpdict[d]=theseev
          #make an event number vector that has all events up to the max
          fullev=[]
-         for i in np.arange(d*10000,np.max(theseev)+1):
-           fullev.extend([i])
+         #for i in np.arange(d*10000,np.max(theseev)+1):
+         #for i in np.arange(d*10000,d*10000+9999):
+         #  fullev.extend([i])
 
          print(fullev)
-         events=io.getRawEvents(pdir,series,eventNumbers=fullev)
-         for j in fullev:
-           intseries=np.char.replace(series,'_','')
-           intseries=int(intseries)
-           #print(intseries)
-           print(events['Z1']['PA'][intseries,j])
+         #events=io.getRawEvents(pdir,series,eventNumbers=fullev)
+         myreader = io.RawDataReader(filepath=pdir, series=series) 
+         events =  myreader.read_events(dump_nums=[d], output_format=1, skip_empty=True)
+         railed=[]
+         for oneev in events:
+           print(oneev)
+
+       print(dumpdict)
+         #for j in fullev:
+         #  intseries=np.char.replace(series,'_','')
+         #  intseries=int(intseries)
+         #  #print(intseries)
+         #  print(events['Z1']['PA'][intseries,j])
+         #  if isRailed(events['Z1']['PA'][intseries,j]):
+         #    railed.extend([j])
+
+         #railed=np.asarray(railed)
+         ##print(np.shape(railed)) 
+         #shifts=[]
+         #for e in theseev:
+         #  shifts.extend([np.sum(railed<=e)])
+
+         #print(shifts)
 
 
        return
