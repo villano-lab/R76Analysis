@@ -135,10 +135,19 @@ def fetchModifiedDF(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_
             
 
             #print(data) 
+            #multiind = pd.MultiIndex.from_tuples([], names=(u'one', u'two')) 
+            dcrc=[]
+            chan=[]
             for key in data.keys():
               if key.startswith('Z'):
                 for key2 in data[key].keys():
-                  print((key,key2))
+                  #print((key,key2))
+                  dcrc.append(key)
+                  chan.append(key2)
+
+            mi = pd.MultiIndex.from_product([dcrc,chan], names=["zip", "chan"])
+
+            print(mi)
             detectors = [key for key in data.keys() if key.startswith('Z')]
             #print(detectors)   
             #for key in detectors:
