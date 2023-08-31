@@ -127,36 +127,21 @@ def fetchModifiedDF(pdir="/data/chocula/villaa/pyraw_staging/",series='07220830_
             # extract data based on index
             index = event_num%10000
             data = events[index]
-            #data = events.iloc[index]
-            #print(type(data))
-            #print(type(df))
-            #data = data.to_frame()
-            #df = pd.concat([df,data])
-            
 
-            #print(data) 
-            #multiind = pd.MultiIndex.from_tuples([], names=(u'one', u'two')) 
             dcrc=[]
             chan=[]
             for key in data.keys():
               if key.startswith('Z'):
                 for key2 in data[key].keys():
-                  #print((key,key2))
                   dcrc.append(key)
                   chan.append(key2)
 
             mi = pd.MultiIndex.from_product([dcrc,chan], names=["zip", "chan"])
 
-            print(mi)
-            detectors = [key for key in data.keys() if key.startswith('Z')]
-            #print(detectors)   
-            #for key in detectors:
-            #  print(data[key])       
-    
             # append to list
             event_num_list.append(event_num)
             event_series_list.append(data['event']['SeriesNumber'])
-            event_data_list.append(pd.Series({key: data[key] for key in detectors}))   
+            event_data_list.append(pd.Series({key: data[key[0]][key[1]] for key in mi}))   
  
  
        # convert to multi index dataframe
