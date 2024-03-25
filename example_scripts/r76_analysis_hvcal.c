@@ -164,7 +164,7 @@ c1->Print("/data/chocula/fritts/run076/r76_0V_intspec.png")
 // look at position dependent stuff
 int xpix = 500, ypix = 500;
 TCanvas *csquare = new TCanvas("csquare","csquare",xpix*5/4+4,ypix*5/4+24);
-z->SetAlias("xdel","1e6*(PEWKr20-0.5*(PCWKr20+PDWKr20))-1")
+z->SetAlias("xdel","1e6*(PEWKr20-0.5*(PCWKr20+PDWKr20))-1") // but what does this mean
 z->SetAlias("ydel","1e6*(0.866*(PDWKr20-PCWKr20))+9")
 // note empirical offsets in xdel, ydel
 z->Draw("ydel:xdel>>h(200,-30,30,200,-30,30)",!crand+cbsf+"PTOFkeV>12&&PTOFkeV<20","colz")
@@ -189,7 +189,7 @@ c1->Print("/data/chocula/fritts/run076/r76_0V_widvsphi_50-70keV.png")
 z->Draw("1e6*(PFWKr20-PAWKr20):sqrt(xdel**2+ydel**2)>>h(200,0,30,200,-30,30)",!crand+cbsf+"PTOFkeV>12&&PTOFkeV<20","colz")
 
 z->SetAlias("afdel","1e6*(PFWKr20-PAWKr20)")
-z->SetAlias("phidel","180./3.14159*atan2(ydel,xdel)")
+z->SetAlias("phidel","180./3.14159*atan2(ydel,xdel)") //angle between xdel,ydel in degrees
 
 TCut camdel = "(afdel+3.5)**2/5.5**2+(phidel+1)**2/20**2<1"
 
