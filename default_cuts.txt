@@ -1,0 +1,22 @@
+# This is a default/example 'cuts' file for use with cut_data.py.
+# It will INCLUDE only data which matches each cut.
+# The substrings it's looking for are:
+# comparators: >,<,==,!=
+# or: ||
+# calculation: +,-,*,/,^,(,)
+# names: x[","]
+# if you attempt to condition differently (e.g. "and" statements) or use alternate versions of these characters (e.g. using [] intead of ()), the parser will probably get confused, so be careful.
+#Each line is a separate condition. You will only output data that matches ALL lines.
+
+#EventCategory == 0 #Nonrandom events only #If we enable this we won't get cut files for randoms.
+x["PFOFamps"]/x["PTOFamps"] > 0.21
+x["phidel"] > 5
+x["phidel"] < 20
+x["BSel"] < 1100
+#goodwalk
+x["PCWKr20"]>0.25e-3
+x["PCWKr20"]<0.5e-3
+x["PDWKr20"]>0.25e-3
+x["PDWKr20"]<0.5e-3
+x["PEWKr20"]>0.25e-3
+x["PEWKr20"]<0.5e-3
