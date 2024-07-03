@@ -134,3 +134,5 @@ dmypy.json
 # Large ROOT files
 R76Data
 midasfilterFiles
+coin_analysis/data/r76_events_coincidencepeak_LE.pkl
+coin_analysis/data/r76_events_coincidencepeak.pkl
