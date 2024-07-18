@@ -93,7 +93,34 @@ def cofintt(x):
     except:
         PTINTall_arr = x["PTINTall_PTbscorr"]
     return (PTINTall_arr/x["PTOFamps"]>250) & (PTINTall_arr/x["PTOFamps"]<550)
-        
+
+aliasdeps = {
+    'PTwid':["PTWKf40","PTWKr40"],
+    'PTdbs':["PAbspost","PAbs","PBbspost","PBbs","PCbspost","PCbs","PDbspost","PDbs","PEbspost","PEbs","PFbspost","PFbs"],
+    'pt_keV':['PTOFamps'],
+    'pt0_keV':['PTOFamps0'],
+    'PTINTall_PTbscorr':['PTdbs','PTINTall','PFnorm'],
+    'xdel':['PEWkr20','PCWkr20','PDWkr20'],
+    'ydel':['PDWKr20','PCWKr20'],
+    'phidel':['PEWkr20','PCWkr20','PDWkr20'],
+    'afdel':['PFWKr20','PAWKr20'],
+    'PSUMbs':['PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
+    'BSel':['PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
+    'bscorr':['PTOFamps','PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
+    'crand':['EventCategory'],
+    'cam':['PFOFamps','PTOFamps'],
+    'cphi1':['PEWkr20','PCWkr20','PDWkr20'],
+    'cbs':['PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
+    'cgoodwalk':['PCWKr20','PDWKr20','PEWKr20'],
+    'cofintl':['PTdbs','PTINTall','PFnorm','PTOFamps'],
+    'cofintt':['PTdbs','PTINTall','PFnorm','PTOFamps']
+}
+
+filterdeps = {
+    'PAWKr50':"z4",
+    'PAWKmax':"z4"
+}
+
 #Functions
 def makechain(filelist,filters=None,friends=True,aliases=[],trees=["e","z"]):
     #filelist: matches a list of files to import as the chain
@@ -192,12 +219,12 @@ def makechain_list(serieslist,path="",filters=None,friends=True,aliases=[],trees
             else:
                 return e,z
 
+#These are super slow, you don't want to use them.
 def getonlinefiles(directory,c,path=paths["fritts"]):
     c.chdir(path)
     ls = c.listdir(directory); ls = fnmatch.filter(ls, 'umn*.root')
     filelist = [c.open(directory+"/"+filename) for filename in ls]
     return filelist
-
 def makeonlinechain(directory,user=None,filters=None,path=paths["fritts"]):
     if user == None:
         user = getpass.getuser()
@@ -205,6 +232,7 @@ def makeonlinechain(directory,user=None,filters=None,path=paths["fritts"]):
         filelist = getonlinefiles(directory,c)
         return makechain(filelist,fittingfilters)
     
+
 def applybscorr(z,ser,corrections=None,m=None,b=None,path="./"):
     #z: a list of chains as output by makechain_list or iteration over makechain
     #ser: a list of series used for generating z
