@@ -3,13 +3,17 @@
 #pspit a smaller file out
 
 #Imports
-import re
+import re, sys, os
 import argparse as ap
+sys.path.append(os.path.abspath('python'))
 import R76Tools as R76
 from itertools import chain
 
+#Settings
+debug = False#True
+
 #Constants
-#comparators = set([">","<","==","!="])
+comparators = set([">","<","==","!="])
 #splitters = comparators.union(["+","-","*","/","^","(",")","e+"])
 pattern = r'x\[\"(.*?)\"\]'
 filters = ["Row","SeriesNumber","EventNumber","pt_keVee","coinwin","PTOFdelay","PAWKmax","PAWKr50","cchisq"]
@@ -45,19 +49,23 @@ for line in open(args.cutfile,"r"):
     to_sort = re.findall(pattern,nline)
     for phrase in to_sort:
         try: #Check if it's an alias
-            getattr(R76,value)
-                aliases.append(value)
-            except AttributeError: #Assume it's a filter
-                filters.append(value) 
+            getattr(R76,phrase)
+            aliases.append(phrase)
+        except AttributeError: #Assume it's a filter
+            filters.append(phrase) 
     cuts.append(nline)
 
 #Now expand dependencies and kill duplicates
+if debug: print(filters)
 aliases = set(aliases)
 for alias in aliases: 
-    for filter_val in R76.aliasdeps[alias]: filters.append(filter_val)
+    for filter_val in R76.aliasdeps[alias]: 
+        filters.append(filter_val)
 filters = set(filters)
+if debug: print(filters) #debug
 trees = []
-for filter_val in filters: trees.append(R76.filterdeps[filter_val])
+for filter_val in filters:
+    trees.append(R76.filterdeps[filter_val])
 trees = set(trees)
 
 #Open files for reading/writing

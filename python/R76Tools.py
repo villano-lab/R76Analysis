@@ -100,26 +100,34 @@ aliasdeps = {
     'pt_keV':['PTOFamps'],
     'pt0_keV':['PTOFamps0'],
     'PTINTall_PTbscorr':['PTdbs','PTINTall','PFnorm'],
-    'xdel':['PEWkr20','PCWkr20','PDWkr20'],
+    'xdel':['PEWKr20','PCWr20','PDWKr20'],
     'ydel':['PDWKr20','PCWKr20'],
-    'phidel':['PEWkr20','PCWkr20','PDWkr20'],
+    'phidel':['PEWKr20','PCWKr20','PDWKr20'],
     'afdel':['PFWKr20','PAWKr20'],
     'PSUMbs':['PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
     'BSel':['PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
     'bscorr':['PTOFamps','PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
     'crand':['EventCategory'],
     'cam':['PFOFamps','PTOFamps'],
-    'cphi1':['PEWkr20','PCWkr20','PDWkr20'],
+    'cphi1':['PEWKr20','PCWKr20','PDWKr20'],
     'cbs':['PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
     'cgoodwalk':['PCWKr20','PDWKr20','PEWKr20'],
     'cofintl':['PTdbs','PTINTall','PFnorm','PTOFamps'],
     'cofintt':['PTdbs','PTINTall','PFnorm','PTOFamps']
 }
 
-filterdeps = {
-    'PAWKr50':"z4",
-    'PAWKmax':"z4"
-}
+#Systematically create dictionary that associates all these things with their tree.
+filterdeps = { #I am uncertain of the ones manually assigned here.
+    'EventNumber': "e",
+    'pt_keVee': "z",
+    'PTOFdelay': "z"
+} 
+for letter in ['A','B','C','D','E','F','T']:
+    for simple in ['OFamps','bs']:
+        filterdeps['P'+letter+simple] = "z4"
+    for rf in ['r','f']:
+        for number in ['20','50','min','max']:
+            filterdeps['P'+letter+'WK'+rf+number] = "z4"
 
 #Functions
 def makechain(filelist,filters=None,friends=True,aliases=[],trees=["e","z"]):

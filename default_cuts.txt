@@ -6,7 +6,7 @@
 #Each line is a separate condition. You will only output data that matches ALL lines.
 
 #EventCategory == 0 #Nonrandom events only #If we enable this we won't get cut files for randoms.
-x["PFOFamps/x["PTOFamps"] > 0.21
+x["PFOFamps"]/x["PTOFamps"] > 0.21
 x["phidel"] > 5
 x["phidel"] < 20
 x["BSel"] < 1100
