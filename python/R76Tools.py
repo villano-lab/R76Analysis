@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 try:
     from pysftp import Connection
-except:
-    warnings.warn("Module `pysftp` was missing. Online functions for use of data via SSH will be unavailable.",warnings.ImportWarning)
+except ModuleNotFoundError:
+    warnings.warn("Module `pysftp` was missing. Online functions for use of data via SSH will be unavailable.")#,warnings.ImportWarning)
 
 #Some constants to be able to call
 fittingfilters = ["EventCategory","PTWKf40","PTWKr40","P[A-Z]bs","P[A-Z]bspost","PTINTall","PFnorm","P[A-Z]OFamps","P[A-Z]WK[rf][24]0"]
@@ -84,14 +84,14 @@ def cgoodwalk(x):
 def cofintl(x):
     try:
         PTINTall_arr = x["PTINTall_PTbscorr"]
-    except:
-        PTINTall_arr = x["PTINTall_PTbscorr"]
+    except KeyError:
+        PTINTall_arr = PTINTall_PTbscorr(x)
     return (PTINTall_arr/x["PTOFamps"]>50) & (PTINTall_arr/x["PTOFamps"]<750)
 def cofintt(x):
     try:
         PTINTall_arr = x["PTINTall_PTbscorr"]
-    except:
-        PTINTall_arr = x["PTINTall_PTbscorr"]
+    except KeyError:
+        PTINTall_arr = PTINTall_PTbscorr(x)
     return (PTINTall_arr/x["PTOFamps"]>250) & (PTINTall_arr/x["PTOFamps"]<550)
 
 aliasdeps = {
@@ -112,7 +112,7 @@ aliasdeps = {
     'cphi1':['PEWKr20','PCWKr20','PDWKr20'],
     'cbs':['PAbs','PBbs','PCbs','PDbs','PEbs','PFbs'],
     'cgoodwalk':['PCWKr20','PDWKr20','PEWKr20'],
-    'cofintl':['PTdbs','PTINTall','PFnorm','PTOFamps'],
+    'cofintl':['PTdbs','PTINTall','PFnorm','PTOFamps','PTINTall_PTbscorr'],
     'cofintt':['PTdbs','PTINTall','PFnorm','PTOFamps']
 }
 
@@ -241,17 +241,21 @@ def makeonlinechain(directory,user=None,filters=None,path=paths["fritts"]):
         return makechain(filelist,fittingfilters)
     
 
-def applybscorr(z,ser,corrections=None,m=None,b=None,path="./"):
+def applybscorr(z,ser,corrections=None,m=None,b=None,path="baseline_correction/"):
     #z: a list of chains as output by makechain_list or iteration over makechain
     #ser: a list of series used for generating z
     #corrections: a pandas dataframe holding baseline correction data (optional).
     #m,b: slope,intercept (optional). If unprovided will be derived from csv.
     #path: the relative path leading to baselinecorrectionvalues, if corrections is not none.
-    for i,x in enumerate(z):
-        if (corrections == None) and (m == None) and (b == None): #read correction data if missing
-            corrections = pd.read_csv(path+"baselinecorrectionvalues.csv")
-        if (m == None) and (b == None):
-            pass #actually this should assign them but y'know
+    debug = False #currently using this to comment out unwanted debugging
+    if debug: print(corrections)
+    if corrections == None:
+        corrections = pd.read_csv(path+"baselinecorrectionvalues.csv",index=None)
+        print(corrections["series"])
+        corrections = corrections[corrections["series"] == ser]
+        temp = corrections[corrections["series"] == x]
+    m = temp['m']; b = temp['b']
+    return bscorr(x,m/b)
     raise ValueError("This function isn't done yet!")
     
 def gaus(x,mu=0,sigma=1,A=1):
