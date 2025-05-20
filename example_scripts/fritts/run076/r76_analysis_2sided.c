@@ -43,7 +43,7 @@ if(s==1)z->SetAlias("PCS2r20","PCS2WKr20-(Entry$>55e3)*5e-6")
 if(s==2)z->SetAlias("PCS2r20","PCS2WKr20-(Entry$>90e3)*5.5e-6")
 
 // good time info cut removes some of the events for which the walk algorithm fails
-TCut ctgood = "PFS1WKr20>0.00036&&PFS1WKr20<0.00043&&PES1WKr20>0.00036&&PES1WKr20<0.00043&&PDS1WKr20>0.00036&&PDS1WKr20<0.00043&&PCS1WKr20>0.00036&&PCS1WKr20<0.00043"
+TCut ctgood = "PFS1WKr20>0.00036 && PFS1WKr20<0.00043 && PES1WKr20>0.00036 && PES1WKr20<0.00043 && PDS1WKr20>0.00036&&PDS1WKr20<0.00043&&PCS1WKr20>0.00036&&PCS1WKr20<0.00043"
 
 // ===============================================================================================
 // plots of time delays between two channels. select channel names (A, B, C, D, E, F) and sides (1, 2)

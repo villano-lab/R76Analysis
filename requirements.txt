@@ -6,3 +6,4 @@ scipy
 matplotlib
 lmfit
 pandas
+sre_yield
