@@ -7,11 +7,73 @@
 // {0, 13.95, 17.74, 20.8, 26.4, 59.54}
 
 /////////////
-// 0V data //
+// setup   //
 /////////////
 
 gStyle->SetOptStat(0)
 char* datapath ="/data/chocula/fritts/data/k100proc/midasrq/byseries/"
+
+float amp14 = 4.03878e-07
+float wid1 = 113.545; 
+float wid2 = 146.356; 
+float f2 = 0.832213;
+float pk = 0.085; 
+float hv = 195.6 //<<<<<<
+float gntl = 1.+hv/3.8
+float tsechv = 3995
+
+float tsecsim = 100e6/(1e-6*3.7e10)
+float bf_60 = 0.3592
+// source: http://www.nucleide.org/DDEP_WG/Nuclides/Am-241_tables.pdf
+float bf_14 = bf_60*0.353/2.68
+
+//for plotting
+TLine l14(pk,40,pk,160); 
+int xpix = 500, ypix = 500; //for position-dependent stuff
+TCanvas *csquare = new TCanvas("csquare","csquare",xpix*5/4+4,ypix*5/4+24);
+TGraph g
+
+//cuts
+
+TCut crand = "EventCategory"
+TCut centrytime = "Entry$<40e3" //<<<<<<
+TCut c14 = "PTOFkeV>12&&PTOFkeV<16"
+TCut c18 = "PTOFkeV>16.6&&PTOFkeV<18.5" //<<<<<<
+//TCut c60 = "PTOFkeV>50&&PTOFkeV<56" //<<<<<<
+TCut c60 = "PTOFkeV>47&&PTOFkeV<52" //<<<<<<
+
+TCut cofint_strict = "PTINTall/PTOFkeV>0&&PTINTall/PTOFkeV<0.0005"
+TCut cofint_vstrict = "PTINTall/PTOFkeV>0.0002&&PTINTall/PTOFkeV<0.0005"
+TCut caml = "phidel>-30&&phidel<20&&afdel<7"
+TCut camdel = "(afdel+3.5)**2/5.5**2+(phidel+1)**2/20**2<1"
+TCut cafbound = "20.**2>(phidel+1)**2"
+
+TCut cbsf0 = "PFbs<2800" //<<<<<<
+//Am-cut
+TCut cam0 = "PDOFamps/PTOFamps>0.205&&PDOFamps/PTOFamps<0.225" //<<<<<<
+TCut c14_0 = "PTOFkeV>12&&PTOFkeV<16"
+TCut c18_0 = "PTOFkeV>16.6&&PTOFkeV<18.5" //<<<<<<
+TCut c60_0 = "PTOFkeV>50&&PTOFkeV<56" //<<<<<<
+
+TCut cofint0 = "PTINTall/PTOFwckeV>0&&PTINTall/PTOFwckeV<12e-6"
+TCut cam0f = "PDOFamps/PTOFamps<PTOFwckeV*0.00025+0.255&&PDOFamps/PTOFamps>-8.333e-5*PTOFwckeV+0.195"
+
+//////////////
+// SIM DATA //
+//////////////
+TChain* sim = new TChain("simtree")
+sim->Add("/data/chocula/fritts/data/k100sim/Am60Si_100M.root")
+sim->SetAlias("keV","Sum$(D3)*1000")
+//
+//
+TChain* sim14 = new TChain("simtree")
+sim14->Add("/data/chocula/fritts/data/k100sim/Am14Si_10M.root")
+sim14->SetAlias("keV","Sum$(D3)*1000")
+
+/////////////
+// 0V data //
+/////////////
+
 char* ser = "07220510_0917" //<<<<<<
 //char* ser = "07220513_0853" //<<<<<<
 TChain *e = new TChain("rqDir/eventTree")
@@ -20,17 +82,20 @@ e->Add(Form("%s/%s/umn*root",datapath,ser));
 z->Add(Form("%s/%s/umn*root",datapath,ser));
 z->AddFriend(e)
 //z->SetLineColor(kRed)
-TCut crand = "EventCategory"
 z->SetAlias("PTwid","(PTWKf40-PTWKr40)*1e6")
 
+TCut cam = "PDOFamps/PTOFamps>0.205&&PDOFamps/PTOFamps<0.225" //<<<<<<
+TCut cbsf = "PFbs<2800" //<<<<<<
+
+z->SetAlias("xdel","1e6*(PEWKr20-0.5*(PCWKr20+PDWKr20))-1")
+z->SetAlias("ydel","1e6*(0.866*(PDWKr20-PCWKr20))+9")
+    
 //initial baseline cut
 //z->Draw("PFbs:PFINTall",crand)
-TCut cbsf = "PFbs<2800" //<<<<<<
 
 //identify peaks using partition
 //z->Draw("PDOFamps/PTOFamps:PTOFamps>>h(300,0,2e-6,200,0,0.5)",!crand+cbsf,"colz")
 //Am-cut
-TCut cam = "PDOFamps/PTOFamps>0.205&&PDOFamps/PTOFamps<0.225" //<<<<<<
 //TCut cam = "PDOFamps/PTOFamps>0.28&&PDOFamps/PTOFamps<0.36" //<<<<<<
 //
 // Figure
@@ -60,8 +125,7 @@ z->SetAlias("PTOF1amps","PTOFamps/(4.518152e+00+-1.320132e-03*PDbs)")
 
 //check for variation in time
 //z->Draw("PTOF1amps:Entry$",!crand+cbsf+cam)
-TCut ctime = "Entry$<40e3" //<<<<<<
-//TCut ctime = "Entry$>0" //<<<<<<
+//TCut centrytime = "Entry$>0" //<<<<<<
 //
 // Figure
 //TGraph g; g.SetPoint(0,40e3,0); g.SetPoint(1,40e3,1); g.Draw("l");
@@ -69,17 +133,15 @@ TCut ctime = "Entry$<40e3" //<<<<<<
 //c1->Print("/data/chocula/fritts/run076/r76_0V_timevar.png")
 
 //calibrate to 14keV line
-//z->Draw("PTOF1amps>>h(300,0.2e-6,1e-6)",!crand+cbsf+cam+ctime)
+//z->Draw("PTOF1amps>>h(300,0.2e-6,1e-6)",!crand+cbsf+cam+centrytime)
 //h->Fit("gaus","","",0.39e-6,0.42e-6) //<<<<<<
 //float amp14 = h->GetFunction("gaus")->GetParameter(1)
 //cout<<endl<<"//float amp14 = "<<amp14<<endl<<endl
-float amp14 = 4.03878e-07
 //float amp14 = 3.02761e-07
 z->SetAlias("PTOFkeV",Form("PTOF1amps*13.95/%e",amp14))
-TCut c14 = "PTOFkeV>12&&PTOFkeV<16"
 //
 // Figure
-//z->Draw("PTOF1amps>>hl(300,0.2e-6,1e-6)",!crand+cbsf+cam+!ctime)
+//z->Draw("PTOF1amps>>hl(300,0.2e-6,1e-6)",!crand+cbsf+cam+!centrytime)
 //hl->SetLineColor(kGray)
 //hl->SetTitle(Form("%s 0 Volt;PTOFamps;counts/bin",ser))
 //TLegend leg(0.6,0.7,0.88,0.88);leg.SetFillColor(kWhite);
@@ -94,8 +156,8 @@ TCut c14 = "PTOFkeV>12&&PTOFkeV<16"
 //c1->Print("/data/chocula/fritts/run076/r76_0V_ofspec_fit14.png")
 //
 // Figure
-//z->Draw("PTOF1amps>>h(300,0.2e-6,2e-6)",!crand+cbsf+cam+ctime)
-//z->Draw("PTOFamps>>h0(300,0.2e-6,2e-6)",!crand+cbsf+cam+ctime,"same")
+//z->Draw("PTOF1amps>>h(300,0.2e-6,2e-6)",!crand+cbsf+cam+centrytime)
+//z->Draw("PTOFamps>>h0(300,0.2e-6,2e-6)",!crand+cbsf+cam+centrytime,"same")
 //h0->SetLineColor(kGray)
 //h->SetTitle(Form("%s 0 Volt;PTOFamps;counts/bin",ser))
 //TLegend leg(0.5,0.7,0.88,0.88);leg.SetFillColor(kWhite);
@@ -106,21 +168,19 @@ TCut c14 = "PTOFkeV>12&&PTOFkeV<16"
 //c1->Print("/data/chocula/fritts/run076/r76_0V_ofspec_bscorr_w.png")
 
 //correct energy to pulse width 
-//z->Draw("PTwid:PTOFkeV",!crand+cbsf+ctime+cam)
+//z->Draw("PTwid:PTOFkeV",!crand+cbsf+centrytime+cam)
 //
-//z->Draw("PTOFkeV>>h(300,0,80)",!crand+cbsf+cam+ctime)
-TCut c18 = "PTOFkeV>16.6&&PTOFkeV<18.5" //<<<<<<
-//TCut c60 = "PTOFkeV>50&&PTOFkeV<56" //<<<<<<
-TCut c60 = "PTOFkeV>47&&PTOFkeV<52" //<<<<<<
-//z->Draw("PTOFkeV>>h18(50)",!crand+cbsf+cam+ctime+c18)
+//z->Draw("PTOFkeV>>h(300,0,80)",!crand+cbsf+cam+centrytime)
+
+//z->Draw("PTOFkeV>>h18(50)",!crand+cbsf+cam+centrytime+c18)
 //h18->Fit("gaus")
-//z->Draw("PTOFkeV>>h60(50)",!crand+cbsf+cam+ctime+c60)
+//z->Draw("PTOFkeV>>h60(50)",!crand+cbsf+cam+centrytime+c60)
 //h60->Fit("gaus")
-//z->Draw("PTwid>>hw14(200,0,500)",!crand+cbsf+cam+ctime+c14)
+//z->Draw("PTwid>>hw14(200,0,500)",!crand+cbsf+cam+centrytime+c14)
 //hw14->Fit("gaus")
-//z->Draw("PTwid>>hw18(200,0,500)",!crand+cbsf+cam+ctime+c18)
+//z->Draw("PTwid>>hw18(200,0,500)",!crand+cbsf+cam+centrytime+c18)
 //hw18->Fit("gaus")
-//z->Draw("PTwid>>hw60(200,0,500)",!crand+cbsf+cam+ctime+c60)
+//z->Draw("PTwid>>hw60(200,0,500)",!crand+cbsf+cam+centrytime+c60)
 //hw60->Fit("gaus")
 //TGraph g
 //g.SetPoint(0,hw14->GetFunction("gaus")->GetParameter(1),1)
@@ -130,10 +190,9 @@ TCut c60 = "PTOFkeV>47&&PTOFkeV<52" //<<<<<<
 //g.Fit("pol1")
 //cout<<endl<<"//float wid1 = "<<g.GetX()[0]<<"; float wid2 = "<<g.GetX()[1]<<"; float f2 = "<<g.GetY()[1]<<";"<<endl<<endl
 //float wid1 = 111.177; float wid2 = 146.052; float f2 = 0.891119; //<<<<<<
-float wid1 = 113.545; float wid2 = 146.356; float f2 = 0.832213;
 //
 // figure
-//z->Draw("PTwid:PTOFkeV",!crand+cbsf+ctime+cam)
+//z->Draw("PTwid:PTOFkeV",!crand+cbsf+centrytime+cam)
 //float x[]={13.95,13.95,17.74,17.74,20.8,20.8,26.4,26.4,59.54,59.54};
 //float y[]={0,1000,1000,0,0,1000,1000,0,0,1000,1000,0,0,1000,1000,0}
 //TGraph g(10,x,y); g.SetLineColor(kGreen);
@@ -142,7 +201,7 @@ float wid1 = 113.545; float wid2 = 146.356; float f2 = 0.832213;
 //c1->Print("/data/chocula/fritts/run076/r76_0V_widthvsenergy.png")
 
 // figure
-//z->Draw(Form("(59.54-13.95)/(%f-13.95)*(PTOFkeV-13.95)+13.95>>hc(300,0,80)",h60->GetFunction("gaus")->GetParameter(1)),!crand+cbsf+cam+ctime)
+//z->Draw(Form("(59.54-13.95)/(%f-13.95)*(PTOFkeV-13.95)+13.95>>hc(300,0,80)",h60->GetFunction("gaus")->GetParameter(1)),!crand+cbsf+cam+centrytime)
 //float x[]={13.95,13.95,17.74,17.74,59.54,59.54};
 //float y[]={-10,1000,1000,-10,-10,1000,1000,-10,-10,1000,1000,-10}
 //TGraph g(6,x,y); g.SetLineColor(kGreen);
@@ -152,20 +211,16 @@ float wid1 = 113.545; float wid2 = 146.356; float f2 = 0.832213;
 //c1->Print("/data/chocula/fritts/run076/r76_0V_espec_widcorr.png")
 
 // check linearity of PTINTall
-z->Draw("PTINTall*1000>>h(100,0,0.5)",!crand+cbsf+ctime+!cam)
+z->Draw("PTINTall*1000>>h(100,0,0.5)",!crand+cbsf+centrytime+!cam)
 h->SetTitle(Form("%s 0 Volt;PTINTall*1000;counts/bin",ser))
 h->Draw()
-z->Draw("PTINTall*1000",!crand+cbsf+ctime+!cam+c14,"same")
-z->Draw("PTINTall*1000",!crand+cbsf+ctime+!cam+c60,"same")
-float pk = 0.085; TLine l14(pk,40,pk,160); l14.Draw("same"); TLine l60(pk*59.54/13.95,40,pk*59.54/13.95,160); l60.Draw("same");
+z->Draw("PTINTall*1000",!crand+cbsf+centrytime+!cam+c14,"same")
+z->Draw("PTINTall*1000",!crand+cbsf+centrytime+!cam+c60,"same")
+l14.Draw("same"); TLine l60(pk*59.54/13.95,40,pk*59.54/13.95,160); l60.Draw("same");
 c1->Print("~/K100/run076/r76_0V_intspec.png")
 c1->Print("/data/chocula/fritts/run076/r76_0V_intspec.png")
 
-// look at position dependent stuff
-int xpix = 500, ypix = 500;
-TCanvas *csquare = new TCanvas("csquare","csquare",xpix*5/4+4,ypix*5/4+24);
-z->SetAlias("xdel","1e6*(PEWKr20-0.5*(PCWKr20+PDWKr20))-1")
-z->SetAlias("ydel","1e6*(0.866*(PDWKr20-PCWKr20))+9")
+// look at position dependent stuff    
 // note empirical offsets in xdel, ydel
 z->Draw("ydel:xdel>>h(200,-30,30,200,-30,30)",!crand+cbsf+"PTOFkeV>12&&PTOFkeV<20","colz")
 h->SetTitle(Form("%s 0 Volt, 12-20 keV;inner-ring x_del [#mus];inner-ring y_del [#mus]",ser))
@@ -185,13 +240,10 @@ h->SetTitle(Form("%s 0 Volt, 50-70 keV;inner-ring phi_del [degrees];pT 40%-width
 h->Draw("colz")
 c1->Print("~/K100/run076/r76_0V_widvsphi_50-70keV.png")
 c1->Print("/data/chocula/fritts/run076/r76_0V_widvsphi_50-70keV.png")
-
 z->Draw("1e6*(PFWKr20-PAWKr20):sqrt(xdel**2+ydel**2)>>h(200,0,30,200,-30,30)",!crand+cbsf+"PTOFkeV>12&&PTOFkeV<20","colz")
 
 z->SetAlias("afdel","1e6*(PFWKr20-PAWKr20)")
 z->SetAlias("phidel","180./3.14159*atan2(ydel,xdel)")
-
-TCut camdel = "(afdel+3.5)**2/5.5**2+(phidel+1)**2/20**2<1"
 
 z->Draw("afdel:180./3.14159*atan2(ydel,xdel)>>h(200,-180,180,150,-40,40)",!crand+cbsf+"PTOFkeV>4&&PTOFkeV<70","colz")
 
@@ -206,16 +258,12 @@ z->Draw("1e6*(PTWKr40-PTWKr10):PTOFkeV>>h(300,0,70,200,5,20)",!crand+cbsf,"colz"
 /////////////
 
 //07220510_1115	Side2	-195.6
-gStyle->SetOptStat(0)
-char* datapath ="/data/chocula/fritts/data/k100proc/midasrq/byseries/"
 char* ser = "07220510_1115" //<<<<<<
-float hv = 195.6 //<<<<<<
 TChain *e = new TChain("rqDir/eventTree")
 TChain *z = new TChain("rqDir/zip1")
 e->Add(Form("%s/%s/umn*root",datapath,ser));
 z->Add(Form("%s/%s/umn*root",datapath,ser));
 z->AddFriend(e)
-TCut crand = "EventCategory"
 z->SetAlias("PTwid","(PTWKf40-PTWKr40)*1e6")
 
 //correct amplitude to baseline
@@ -226,23 +274,17 @@ z->SetAlias("PTOF01amps","PTOFamps0/(2.461538e+00+-5.494505e-04*PDbs)") //<<<<<<
 // for the bulk this correction is as large as 1/0.70
 
 //calibrate based on 0V 14keV line and NTL gain
-float amp14 = 4.03878e-07 //<<<<<<
-float gntl = 1.+hv/3.8
 z->SetAlias("PTOF1keV",Form("PTOF1amps*13.95/%e",amp14*gntl))
 z->SetAlias("PTOF01keV",Form("PTOF01amps*13.95/%e",amp14*gntl))
 
 //refine baseline cut
 //z->Draw("PDINTall/PTINTall:PTwid>>h(300,0,1000,200,0,0.5)",!crand,"colz")
-TCut cam = "PDINTall/PTINTall>0.18&&PDINTall/PTINTall<0.23&&PTwid>300&&PTwid<1000"
-//z->Draw("PFbs:PTwid",!crand+cam)
-TCut cbsf = "PFbs<3700" //<<<<<<
 // note: correcting PTwid to baseline creates a very sharp energy quantity
 //z->SetAlias("widvarbs","1+(PDbs-2800)*3.05e-4");z->SetAlias("PTwidc","PTwid/widvarbs");.
 
 //correct energy to pulse width 
 float wid1 = 111.177; float wid2 = 146.052; float f2 = 0.891119; //<<<<<<<
 //z->Draw("PTwid:PTOF1keV>>h(150,0,2,100,0,1000)",!crand+cbsf,"colz")
-TGraph g
 g.SetPoint(0,0,140)
 //g.Draw("*")
 g.SetPoint(1,0.4,150)
@@ -288,8 +330,6 @@ z->SetAlias("PTOF0keV",Form("PTOF01keV/(1+%f*(ewid0-%f))",(f2-1.)/(wid2-wid1),wi
 //develop a int-OF agreement cut
 //z->Draw("PTINTall:PTOFkeV",!crand+cbsf+"PTOFkeV>0&&PTOFkeV<4")
 //z->Draw("PTINTall/PTOFkeV:PTOFkeV",!crand+cbsf+"PTOFkeV>0&&PTOFkeV<4&&PTINTall/PTOFkeV<0.04&&PTINTall/PTOFkeV>-0.03")
-TCut cofint_strict = "PTINTall/PTOFkeV>0&&PTINTall/PTOFkeV<0.0005"
-TCut cofint_vstrict = "PTINTall/PTOFkeV>0.0002&&PTINTall/PTOFkeV<0.0005"
 //
 // figure
 //c1->Print("~/K100/run076/r76_m196V_intvsof.png")
@@ -303,38 +343,30 @@ TCut cofint_vstrict = "PTINTall/PTOFkeV>0.0002&&PTINTall/PTOFkeV<0.0005"
 //c1->Print("/data/chocula/fritts/run076/r76_m196V_spec.png")
 
 z->SetAlias("bsdiff","PAbspost+PBbspost+PCbspost+PDbspost+PEbspost+PFbspost-PAbs-PBbs-PCbs-PDbs-PEbs-PFbs")
-
 // Position studies
-int xpix = 500, ypix = 500;
-TCanvas *csquare = new TCanvas("csquare","csquare",xpix*5/4+4,ypix*5/4+24);
 z->SetAlias("xdel","1e6*(PEWKr20-0.5*(PCWKr20+PDWKr20))-1")
 z->SetAlias("ydel","1e6*(0.866*(PDWKr20-PCWKr20))+9")
 // note empirical offsets in xdel, ydel
 z->SetAlias("phidel","180./3.14159*atan2(ydel,xdel)")
 z->SetAlias("afdel","1e6*(PFWKr20-PAWKr20)")
-//
+
+z->SetAlias("afboundp","sqrt(5.5**2*(1.-(phidel+1)**2/20**2))-3.5")
+z->SetAlias("afboundm","-sqrt(5.5**2*(1.-(phidel+1)**2/20**2))-3.5")
+
 csquare->cd()
 z->Draw("ydel:xdel>>h(200,-30,30,200,-30,30)",!crand+cbsf+cofint_vstrict+"PTOFkeV>0&&PTOFkeV<2","colz")
 h->SetTitle(Form("%s -196 Volt, 0-2 keV;inner-ring x_del [#mus];inner-ring y_del [#mus]",ser))
 h->Draw("colz")
 csquare->Print("~/K100/run076/r76_HV_xydel_0-2keV.png")
 csquare->Print("/data/chocula/fritts/run076/r76_HV_xydel_0-2keV.png")
-//
+
 c1->cd()
 z->Draw("afdel:phidel>>h(300,-180,180,200,-30,30)",!crand+cbsf+cofint_vstrict+"PTOFkeV>0&&PTOFkeV<2","colz")
 h->SetTitle(Form("%s -196 Volt, 0-2 keV;inner-ring phi_del [degrees];pF vs pA delay [#mus]",ser))
 h->Draw("colz")
 c1->Print("~/K100/run076/r76_HV_rphidel_0-2keV.png")
 c1->Print("/data/chocula/fritts/run076/r76_HV_rphidel_0-2keV.png")
-//
-TCut caml = "phidel>-30&&phidel<20&&afdel<7"
-TCut camdel = "(afdel+3.5)**2/5.5**2+(phidel+1)**2/20**2<1"
-z->SetAlias("afboundp","sqrt(5.5**2*(1.-(phidel+1)**2/20**2))-3.5")
-z->SetAlias("afboundm","-sqrt(5.5**2*(1.-(phidel+1)**2/20**2))-3.5")
-TCut cafbound = "20.**2>(phidel+1)**2"
-//
-float tsechv = 3995
-//
+    
 z->Draw("PTOFkeV>>h(100,0,2)",!crand+cbsf+cofint_vstrict+caml)
 z->Draw("PTOFkeV>>hb(100,0,2)",!crand+cbsf+cofint_vstrict+!caml,"same")
 h->SetLineColor(kRed)
@@ -346,8 +378,9 @@ h->Draw();hb->Draw("same");leg.Draw();
 c1->Print("~/K100/run076/r76_HV_spec_0-2keV_Amvsbg.png")
 c1->Print("/data/chocula/fritts/run076/r76_HV_spec_0-2keV_Amvsbg.png")
 //
-cout<<endl<<z->GetEntries(!crand+cbsf+cofint_vstrict+!caml+"PTOFkeV>0&&PTOFkeV<=1")<<" bg 0-1"<<endl<<z->GetEntries(!crand+cbsf+cofint_vstrict+!caml+"PTOFkeV>1&&PTOFkeV<=2")<<" bg 1-2"<<endl<<z->GetEntries(!crand+cbsf+cofint_vstrict+caml+"PTOFkeV>0&&PTOFkeV<=1")<<" Am 0-1"<<endl<<z->GetEntries(!crand+cbsf+cofint_vstrict+caml+"PTOFkeV>1&&PTOFkeV<=2")<<" Am 1-2"<<endl<<endl
-//
+cout << endl << z->GetEntries(!crand+cbsf+cofint_vstrict+!caml+"PTOFkeV>0&&PTOFkeV<=1") << " bg 0-1" << endl << z->GetEntries(!crand+cbsf+cofint_vstrict+!caml+"PTOFkeV>1&&PTOFkeV<=2") << " bg 1-2" << endl << z->GetEntries(!crand+cbsf+cofint_vstrict+caml+"PTOFkeV>0&&PTOFkeV<=1") << " Am 0-1" << endl << z->GetEntries(!crand+cbsf+cofint_vstrict+caml+"PTOFkeV>1&&PTOFkeV<=2") << " Am 1-2" << endl << endl
+    
+/* //when i found these they weren't commented out but i can't see how they would be anything but comments
 424 bg 0-1 = 0.11 Hz
 941 bg 1-2 = 0.24 Hz
 1766 Am 0-1 = 0.44 Hz 
@@ -370,33 +403,24 @@ so: 60keV produces extremely few events < 2keV according to Geant
 14keV produces more. If we assume everything from 12-30 produces similar
   amounts, then it's around 0.0066 * bf Hz
   that's still 100x smaller than what is observed 
-
+*/
 
 ///////////////////////
 // 0V data relabeled //
 ///////////////////////
-gStyle->SetOptStat(0)
-char* datapath ="/data/chocula/fritts/data/k100proc/midasrq/byseries/"
 char* ser0 = "07220510_0917" //<<<<<<
 TChain *e0 = new TChain("rqDir/eventTree")
 TChain *z0 = new TChain("rqDir/zip1")
 e0->Add(Form("%s/%s/umn*root",datapath,ser0));
 z0->Add(Form("%s/%s/umn*root",datapath,ser0));
 z0->AddFriend(e0)
-TCut crand = "EventCategory"
 z0->SetAlias("PTwid","(PTWKf40-PTWKr40)*1e6")
-TCut cbsf0 = "PFbs<2800" //<<<<<<
-//Am-cut
-TCut cam0 = "PDOFamps/PTOFamps>0.205&&PDOFamps/PTOFamps<0.225" //<<<<<<
 z0->SetAlias("PTOF1amps","PTOFamps/(4.518152e+00+-1.320132e-03*PDbs)")
-TCut ctime = "Entry$<40e3" //<<<<<<
-//z0->Draw("PTOF1amps>>h(300,0.2e-6,1e-6)",!crand+cbsf0+cam0+ctime)
+TCut centrytime = "Entry$<40e3" //<<<<<<
+//z0->Draw("PTOF1amps>>h(300,0.2e-6,1e-6)",!crand+cbsf0+cam0+centrytime)
 //h->Fit("gaus","","",0.39e-6,0.42e-6) //<<<<<<
 float amp14 = 4.03878e-07
 z0->SetAlias("PTOFkeV",Form("PTOF1amps*13.95/%e",amp14))
-TCut c14_0 = "PTOFkeV>12&&PTOFkeV<16"
-TCut c18_0 = "PTOFkeV>16.6&&PTOFkeV<18.5" //<<<<<<
-TCut c60_0 = "PTOFkeV>50&&PTOFkeV<56" //<<<<<<
 float wid1 = 113.545; float wid2 = 146.356; float f2 = 0.832213;
 // look at position dependent stuff
 z0->SetAlias("xdel","1e6*(PEWKr20-0.5*(PCWKr20+PDWKr20))-1")
@@ -419,30 +443,12 @@ h->SetTitle(Form("%s 0 Volt, 12-30 keV;inner-ring phi_del [degrees];pT 40%-width
 z0->Scan("EventTime",Form("Entry$==1001||Entry$==%d",z0->GetEntries()-1),"colsize=11")
 float tsec0 = 3724
 
-
-//////////////
-// SIM DATA //
-//////////////
-TChain* sim = new TChain("simtree")
-sim->Add("~/K100/k100SimBuild2/Am60Si_100M.root")
-sim->SetAlias("keV","Sum$(D3)*1000")
-float tsecsim = 100e6/(1e-6*3.7e10)
-float bf_60 = 0.3592
-// source: http://www.nucleide.org/DDEP_WG/Nuclides/Am-241_tables.pdf
-float bf_14 = bf_60*0.353/2.68
-//
-//
-TChain* sim14 = new TChain("simtree")
-sim14->Add("~/K100/k100SimBuild2/Am14Si_10M.root")
-sim14->SetAlias("keV","Sum$(D3)*1000")
-float tsecsim14 = 10e6/(1e-6*3.7e10)
-float bf_60 = 0.3592
-// source: http://www.nucleide.org/DDEP_WG/Nuclides/Am-241_tables.pdf
-float bf_14 = bf_60*0.353/2.68
-
 //////////////////////
 // Compare Am rates //
 //////////////////////
+z0->SetAlias("PTOFwckeV","(59.54-13.95)/(52.91-13.95)*(PTOFkeV-13.95)+13.95")
+
+//scatter with errorbars
 sim->Draw("keV>>hsim(80,0,40)","keV>0&&keV<40")
 //hsim->SetBinContent(hsim->GetNbinsX()+1,0)
 hsim->Scale(1./tsecsim/hsim->GetBinWidth(1))
@@ -450,35 +456,37 @@ hsim->Scale(bf_60)
 hsim->SetTitle(";keV;counts/keV/s")
 //hsim->Draw()
 //
-z0->SetAlias("PTOFwckeV","(59.54-13.95)/(52.91-13.95)*(PTOFkeV-13.95)+13.95")
-TCut cofint0 = "PTINTall/PTOFwckeV>0&&PTINTall/PTOFwckeV<12e-6"
-TCut cam0f = "PDOFamps/PTOFamps<PTOFwckeV*0.00025+0.255&&PDOFamps/PTOFamps>-8.333e-5*PTOFwckeV+0.195"
+
 z0->Draw("PTOFwckeV>>h0V(150,0,75)",!crand+cbsf0+cofint0+camdel+cam0f)
 h0V->Scale(1./tsec0/h0V->GetBinWidth(1))
 h0V->SetTitle(";keV;counts/keV/s")
 h0V->Draw()
-//
+
+//scatter with errorbars
 TH1F* hsim60 = new TH1F("hsim60",";keV;counts/keV/s",150,0,75)
 for(int p=0;p<10000;p++)hsim60->Fill(59.54+gRandom->Gaus()*2.275)
 hsim60->Scale(1.*sim->GetEntries("keV>50")/10000/tsecsim/hsim60->GetBinWidth(1))
 hsim60->Scale(bf_60)
 hsim60->Draw()
-//
+
+//scatter with errorbars -- gaussian
 TH1F* hsim14 = new TH1F("hsim14",";keV;counts/keV/s",150,0,75)
 for(int p=0;p<10000;p++)hsim14->Fill(13.95+gRandom->Gaus()*0.98)
 hsim14->Scale(1.*sim14->GetEntries("keV>13")/10000/tsecsim14/hsim14->GetBinWidth(1))
 hsim14->Scale(bf_14)
 hsim14->Draw()
+
 //
 z->Draw("PTOFkeV>>hHV(20,0,4)",!crand+cbsf+cofint_vstrict+camdel+"PTOFkeV<4")
 //hHV->SetBinContent(hHV->GetNbinsX()+1,0)
 hHV->Scale(1./tsechv/hHV->GetBinWidth(1))
 hHV->SetTitle(";keV;counts/keV/s")
 hHV->Draw()
+
 //
 hsim->SetLineColor(kGreen);hsim60->SetLineColor(kGreen);h0V->SetLineColor(kBlue);hHV->SetLineColor(kRed);
 hsim60->Draw();hsim->Draw("same");hHV->Draw("same");h0V->Draw("same");
-//
+
 //
 z0->Draw("PTOFwckeV>>h0Vb(150,0,75)",!crand+cbsf0+cofint0+!camdel)
 h0Vb->Scale(1./tsec0/h0Vb->GetBinWidth(1))
@@ -638,7 +646,7 @@ g.Fit("pol1")
 z0->SetAlias("PTOF1amps",Form("PTOFamps/(%e+%e*PDbs)",g.GetFunction("pol1")->GetParameter(0)/g.GetY()[0],g.GetFunction("pol1")->GetParameter(1)/g.GetY()[0]))
 cout<<endl<<"//z->SetAlias(\"PTOF1amps\",\""<<Form("PTOFamps/(%e+%e*PDbs)",g.GetFunction("pol1")->GetParameter(0)/g.GetY()[0],g.GetFunction("pol1")->GetParameter(1)/g.GetY()[0])<<"\")"<<endl<<endl
 //check for variation in time
-TCut ctime = "Entry$<40e3"
+TCut centrytime = "Entry$<40e3"
 //calibrate to 14keV line
 float amp14 = 4.03878e-07
 z0->SetAlias("PTOFkeV",Form("PTOF1amps*13.95/%e",amp14))
@@ -667,6 +675,7 @@ TCut cafbound = "20.**2>(phidel+1)**2"
 // traces //
 ////////////
 
+/* wasn't commented out but I don't know what this would be besides a comment?
 07220510_1115 110504 // -195.6 V 266 eVee
 07220510_1115 111577 // -195.6 V 266 eVee
 07220510_0917 20051 // 0V 14keV Am
@@ -678,7 +687,7 @@ TCut cafbound = "20.**2>(phidel+1)**2"
 07220510_1115 220241 // -195.6 V  1135 eVee narrow* 183.1175314 * // HAS PILEUP
 07220510_1115 482448 // -195.6 V  1135 eVee narrow* 180.4565273 *
 07220510_1115 410783 // -195.6 V  1135 eVee wide* 212.2044027 *
-
+*/
 
 root CdmsTraces.root
 char* serid = "07220510_0917"

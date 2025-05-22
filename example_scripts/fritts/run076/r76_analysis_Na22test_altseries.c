@@ -8,11 +8,13 @@
 
 // mu-metal outer radius: 26.8 cm
 
+/*
 07220531_0810/ : no Na-22
 07220531_1214/ : with Na-22, 48cm from mu-metal
 07220601_1310/ : with Na-22, 40cm from mu-metal
 07220617_1209/ : muon setup
 07220617_1305/ : muon setup, NaI-triggered
+*/
 
 /////////////
 // 0V data //
@@ -100,12 +102,12 @@ TCut cnaitime = "zip4.PAWKr40>0.00034&&zip4.PAWKr40<0.00043"
 TCut cnaitimetight = "zip4.PAWKr40>0.00038&&zip4.PAWKr40<0.00040"
 //TCut cnaitimetight = "zip4.PAWKr40>0.00040&&zip4.PAWKr40<0.000408"
 
-
+//plot not saved
 z->Draw("zip4.PAWKr40>>h(300,0,0.0035)",cnaibs[s]+c1trig+!crand)
 z->Draw("zip4.PAWKr40>>hr(100,0,0.0035)",cnaibs[s]+c1trig+crand)
 hr->SetLineColor(kRed)
 h->Draw();hr->Draw("same")
-//
+
 float f_true_coin[] ={0.585624, 0.605176, 0.598126, 0.917825}
 h->SetTitle(Form("%s: NaI trigger pulse timing (%0.3f);start time of NaI trigger pulse [s]",serlabel[s],f_true_coin[s]))
 TLegend leg(0.3,.74,0.7,0.87);leg.SetFillColor(kWhite);
@@ -131,6 +133,7 @@ z->SetAlias("phidel","180./3.14159*atan2(ydel,xdel)")
 
 TCut ctime[] = {"Entry$<52050", "Entry$<85e3", "Entry$>35000", "Entry$>0", "Entry$>19200"}
 
+//plot not saved
 // for the NaI-triggered muon test data (s=4) the plot below 
 //  shows that the timing of the NaI trigger pulse is not consistent. 
 z->Draw("zip4.PAWKr40>>h(100,0.000395,0.00041)",!crand+c1trig)
@@ -139,6 +142,7 @@ z->Draw("zip4.PAWKr40>>h(100,0.000395,0.00041)",!crand+c1trig)
 TCut cintwid[] = {"zip1.PTWKf20-zip1.PTWKr20>0.00013+1.65e-7*PTINTkeV+4.35e-10*PTINTkeV**2", "zip1.PTWKf20-zip1.PTWKr20>0.00013+1.65e-7*PTINTkeV+4.35e-10*PTINTkeV**2", "zip1.PTWKf20-zip1.PTWKr20>0.00013+2.083e-7*PTINTkeV+2.9167e-10*PTINTkeV**2", "1", "1"}
 // don't want this cut for muons
 
+//plot not saved (multiple)
 z->Draw("phidel:PTINTkeV>>h(300,0,3000,200,-180,180)",!crand+cbsf[s]+ctime[s]+cintwid[s],"colz")
 z->Draw("phidel:PTINTkeV>>hc(300,0,3000,200,-180,180)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaitimetight,"colz")
 //
@@ -152,11 +156,11 @@ c1->Print(Form("/data/chocula/fritts/run076/r76_Na22_%s_phivsenergy.png",serlabe
 
 TCut camphi[] = {"phidel>-10+0.051*PTINTkeV-1.3e-5*PTINTkeV**2 && phidel<10+0.0455*PTINTkeV-1.05e-5*PTINTkeV**2", "phidel>-12+0.04367*PTINTkeV-1.167e-5*PTINTkeV**2 && phidel<8+0.02725*PTINTkeV-3.75e-6*PTINTkeV**2", "phidel>-10+0.051*PTINTkeV-1.3e-5*PTINTkeV**2 && phidel<10+0.0455*PTINTkeV-1.05e-5*PTINTkeV**2", "phidel>-12+0.04367*PTINTkeV-1.167e-5*PTINTkeV**2 && phidel<8+0.02725*PTINTkeV-3.75e-6*PTINTkeV**2", "(phidel>32&&phidel<44)||(PTINTkeV<100&&phidel>-25&&phidel<25)"}
 
-
+//plot not saved (multiple)
 z->Draw("phidel:PTINTkeV>>h(100,0,3000,70,-180,180)",!crand+cbsf[s]+ctime[s]+cintwid[s],"lego")
 z->Draw("phidel:PTINTkeV>>hc(100,0,3000,70,-180,180)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaitimetight,"lego")
 
-
+//plot not saved
 z->Draw("zip4.PAWKr40>>h(300,0,0.0035)",cnaibs[s]+c1trig+!crand+!camphi[s])
 h->Fit("pol0","","",0.0005,0.0031)
 float accrate = h->GetFunction("pol0")->GetParameter(0)/h->GetBinWidth(1)*(0.00040-0.00036)
@@ -164,6 +168,7 @@ float frac_true_coin = 1.0/(1.0+accrate/z->GetEntries(cnaibs[s]+c1trig+!crand+!c
 cout<<frac_true_coin<<endl
 0.590097, 0.604627, 0.603045, 0.944663 // no improvement with Am events removed, except for muons
 
+//plot not saved (multiple)
 z->Draw("PTINTkeV>>h(20,0,2000)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaibs[s]+c1trig)
 z->Draw("PTINTkeV>>hc(20,0,2000)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaibs[s]+c1trig+cnaitimetight)
 hc->SetLineColor(kRed)
@@ -171,18 +176,20 @@ h->Scale(0.0285225)
 h->Draw();hc->Draw("same")
 
 //muons
+// plot not saved
 z->Draw("PTINTkeV>>h(20,0,3500)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaibs[s]+c1trig)
 z->Draw("PTINTkeV>>hc(20,0,3500)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaibs[s]+c1trig+cnaitimetight)
 hc->SetLineColor(kRed)
 h->Scale(0.0285225)
 hc->Draw();h->Draw("same")
 
+//plot not saved
 z->Draw("PTOFkeV>>h(150,0,150)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaibs[s]+c1trig+!cnaitimetight)
 z->Draw("PTOFkeV>>hc(30,0,150)",!crand+cbsf[s]+ctime[s]+cintwid[s]+cnaibs[s]+c1trig+cnaitimetight)
 hc->SetLineColor(kRed)
 h->Scale(0.1)
 hc->Draw();h->Draw("same")
-//
+
 TLegend leg(0.55,0.6,0.8,0.85);leg.SetFillColor(kWhite);
 leg.AddEntry(h,"coincident","l")
 leg.AddEntry(hc,"not coincident","l")
@@ -192,9 +199,11 @@ c1->Print(Form("~/K100/run076/r76_Na22_%s_spec_ncvc.png",serlabel[s]))
 c1->Print(Form("/data/chocula/fritts/run076/r76_Na22_%s_spec_ncvc.png",serlabel[s]))
 //
 
+//plot not saved
 z->Draw("zip1.PTWKr20-zip4.PAWKr40:PTOFkeV",!crand+cbsf[s]+ctime[s]+cintwid[s]+!camphi[s]+cnaibs[s]+c1trig+cnaitimetight)
 
 //muons
+//plot not saved
 z->Draw("zip1.PTWKr20-zip4.PAWKr40:PTINTkeV",!crand+cbsf[s]+ctime[s]+cintwid[s]+!camphi[s]+cnaibs[s]+c1trig+"zip1.PTWKr20-zip4.PAWKr40>0&&zip1.PTWKr20-zip4.PAWKr40<0.2e-3")
 // with the muon data we see that the coincidence timing as we normally do it has an amplitude dependency
 // let's try a phonon-timing quantity that doesn't depend on relative pulse height, but rather absolute
@@ -204,20 +213,23 @@ int pt_timelev2 = 40 // these are percent levels in PTWKr##
 float  pt_timefrac1 = 1.*pt_timelev1/100
 float  pt_timefrac2 = 1.*pt_timelev2/100
 z->SetAlias("PTWKrlev",Form("(%e/PTWKmax-%f)/(%f-%f)*(PTWKr%i-PTWKr%i)+PTWKr%i",pt_time_level,pt_timefrac1,pt_timefrac2,pt_timefrac1,pt_timelev2,pt_timelev1,pt_timelev1))
-//
+
+//plot not saved
 z->Draw("(PTWKrlev-zip4.PAWKr40)*1e6:PTINTkeV",!crand+cbsf[s]+ctime[s]+cintwid[s]+!camphi[s]+cnaibs[s]+c1trig+cnaitime+"zip1.PTWKr50<460")
-//
+
+//plot not saved
 z->Draw("(2*zip1.PTWKr10-zip1.PTWKr20-zip4.PAWKr40)*1e6:PTINTkeV",!crand+cbsf[s]+ctime[s]+cintwid[s]+!camphi[s]+cnaibs[s]+c1trig+cnaitime+"zip1.PTWKr50<460")
 //
 // muon spectrum
 z->Draw("PTINTkeV",!crand+cbsf[s]+ctime[s]+cintwid[s]+!camphi[s]+cnaibs[s]+c1trig+cnaitime+"zip1.PTWKr50<460&&(2*zip1.PTWKr20-zip1.PTWKr40-zip4.PAWKr40)*1e6>5&&(2*zip1.PTWKr20-zip1.PTWKr40-zip4.PAWKr40)*1e6<30")
-//
+
 TCut crise = "PTWKr50*1e6>370&&PTWKr50*1e6<435"
-//
+
+//plot not saved
 z->Draw("PTINTkeV>>hall(200,0,4000)",!crand+cbsf[s]+ctime[s]+cintwid[s]+crise)
 z->Draw("PTINTkeV>>ham(200,0,4000)",!crand+cbsf[s]+ctime[s]+cintwid[s]+crise+camphi[s],"same")
 z->Draw("PTINTkeV>>hcoin(200,0,4000)",!crand+cbsf[s]+ctime[s]+cintwid[s]+crise+!camphi[s]+cnaibs[s]+c1trig+cnaitime,"same")
-//
+
 // This is interesting. Mostly it's expected - the NaI-coincident spectrum looks like a muon spectrum. 
 // Except, there's an excess below 200-300 keV, and it doesn't look like it's all accidental.
 // Maybe muon showers can produce secondaries preferentially below ~ 300 keV 
@@ -236,10 +248,8 @@ c1->Print(Form("/data/chocula/fritts/run076/r76_muon_%s_spectra.png",serlabel[s]
 TCut clow = "PTINTkeV<300"
 TCut chigh = "PTINTkeV>2000"
 
-
+//plot not saved
 z->Draw("(zip1.PTWKr50-zip4.PAWKr40)*1e6:PTINTkeV",!crand+cbsf[s]+ctime[s]+cintwid[s]+!camphi[s]+cnaibs[s]+c1trig)
-
-
 
 /////////////////////////
 //check timing resolution
@@ -319,16 +329,13 @@ c1->Print(Form("~/K100/run076/r76_muons_%s_oftimediff_high.png",serlabel[s]))
 c1->Print(Form("/data/chocula/fritts/run076/r76_muons_%s_oftimediff_high.png",serlabel[s]))
 
 
-
-
-
 // muon rate
 // choose a time range for pulse maximum
 TCut cwindow = "zip4.PAWKr100>0.0005&&zip4.PAWKr100<0.003"
 float twindow = 0.003-0.0005 // 2.5 ms
 
 // choose an amplitude threshold
- TCut cpeak = "zip4.PAWKmax>0.7e-6"
+TCut cpeak = "zip4.PAWKmax>0.7e-6"
 
 // calculate event rate
 float ntraces = z->GetEntries(crand+cnaibs[s])
@@ -340,7 +347,7 @@ cout<<"// "<<serlabel[s]<<": "<<rate<<" Hz"<<endl
 // muons: 12.4507 Hz
 // predicted from calculation: 13.9 Hz for through-going muons. Pretty close!
 
-
+//plot not saved (multiple)
 // for NaI-triggered muons (s=4), find best timing for fixed-time OF
 // note: ctime[s] selects late times, after NaI timing has shifted late
 z->Draw("PTOFdelay/0.8e-6:PTOFkeV",!crand+cbsf[s]+!ctime[s]+cintwid[s]+cnaibs[s]+c1trig+!camphi[s])
@@ -363,7 +370,7 @@ b
 
 
 
-
+//plot not saved
 z->Draw("zip1.PTINTall>>hall(200,0,0.025)",!crand+cbsf[s]+!cam[s])
 z->Draw("zip1.PTINTall>>hcoin(200,0,0.025)",!crand+cbsf[s]+!cam[s]+cnaitime)
 hall->Draw()
@@ -380,6 +387,7 @@ TCut clow = "zip1.PTINTall>0&&zip1.PTINTall<0.45e-3"
 TCut cmid = "zip1.PTINTall>0.45e-3&&zip1.PTINTall<0.005"
 TCut chi = "zip1.PTINTall>0.005"
 
+//plot not saved (multiple -- to //sim//)
 z->Draw("afdel:phidel>>h(300,-180,180,200,-30,30)",!crand+cbsf[s]+ctime[s]+clow,"colz")
 z->Draw("afdel:phidel>>h(300,-180,180,200,-30,30)",!crand+cbsf[s]+ctime[s]+cmid,"colz")
 z->Draw("afdel:phidel>>h(300,-180,180,200,-30,30)",!crand+cbsf[s]+ctime[s]+chi,"colz")
@@ -483,7 +491,7 @@ h->SetTitle("k100Sim: Na-22 gammas on Si detector;deposited energy [keV]")
 h->Draw()
 c1->Print("~/K100/run076/r76_sim_Na22_spec.png")
 c1->Print("/data/chocula/fritts/run076/r76_sim_Na22_spec.png")
-//
+
 sim->GetEntries("keV_si>0") //(Long64_t)26581
 sim->GetEntries("keV_si>0&&(keV_10>0||keV_11>0||keV_12>0)")
 // (Long64_t)322 -- 1.2%
@@ -504,6 +512,8 @@ TCut c511 = "Entry$>166.91e3"
 ///////////////////////////
 // compare saved spectra /////////////////////////////
 
+//plot not saved (rest of document)
+    
 root ~/K100/run076/spectra_Na22.root
 PTOFkeV_22Na_40cm->SetLineColor(kRed)
 PTOFkeV_22Na_48cm->SetLineColor(kMagenta)
@@ -518,15 +528,20 @@ PTOFkeV_22Na_48cm->Scale(n60_ns/n60_48)
 PTINTkeV_22Na_40cm->Scale(n60_ns/n60_40)
 PTINTkeV_22Na_48cm->Scale(n60_ns/n60_48)
 PTOFkeV_no_source->GetYaxis()->SetRangeUser(0,610)
-PTOFkeV_no_source->Draw();PTOFkeV_22Na_48cm->Draw("same");PTOFkeV_22Na_40cm->Draw("same");
-//
+PTOFkeV_no_source->Draw();
+PTOFkeV_22Na_48cm->Draw("same");
+PTOFkeV_22Na_40cm->Draw("same");
+
 PTINTkeV_no_source->GetYaxis()->SetRangeUser(0,2600)
 PTINTkeV_no_source->SetTitle(";energy [keV] (simple PTINT calibration);counts normalized to 60keV peak")
 TLegend leg(0.5,0.55,0.85,0.85);leg.SetFillColor(kWhite);
 leg.AddEntry(PTINTkeV_22Na_40cm,"Na-22 source @ 67 cm","l")
 leg.AddEntry(PTINTkeV_22Na_48cm,"Na-22 source @ 75 cm","l")
 leg.AddEntry(PTINTkeV_no_source,"no external source","l")
-PTINTkeV_no_source->Draw();PTINTkeV_22Na_48cm->Draw("same");PTINTkeV_22Na_40cm->Draw("same");leg.Draw();
+PTINTkeV_no_source->Draw();
+PTINTkeV_22Na_48cm->Draw("same");
+PTINTkeV_22Na_40cm->Draw("same");
+leg.Draw();
 c1->Print("~/K100/run076/r76_Na22_speccompare.png")
 c1->Print("/data/chocula/fritts/run076/r76_Na22_speccompare.png")
 
